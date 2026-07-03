@@ -1,27 +1,35 @@
 {
   "expo": {
-    "name": "frontend",
-    "slug": "frontend",
+    "name": "ExamVault",
+    "slug": "examvault",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "frontend",
+    "scheme": "examvault",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.emergent.trustpapers.qkojz0"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#000000"
+        "backgroundColor": "#0F172A"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.emergent.trustpapers.qkojz0"
     },
     "web": {
       "bundler": "metro",
-      "output": "single",
-      "favicon": "./assets/images/favicon.png"
+      "output": "static",
+      "favicon": "./assets/images/favicon.png",
+      "name": "ExamVault — Restoring Trust in High-Stakes Examinations",
+      "shortName": "ExamVault",
+      "description": "A Zero-Trust Digital Examination Infrastructure powered by AI, Blockchain and Cryptography.",
+      "themeColor": "#0F172A",
+      "backgroundColor": "#0F172A",
+      "lang": "en"
     },
     "plugins": [
       "expo-router",
@@ -31,7 +39,7 @@
           "image": "./assets/images/splash-image.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#000000"
+          "backgroundColor": "#0F172A"
         }
       ]
     ],

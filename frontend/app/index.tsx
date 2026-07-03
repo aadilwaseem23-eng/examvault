@@ -1,215 +1,481 @@
 import React, { useEffect, useState } from "react";
-import { ScrollView, StyleSheet, Text, View, Pressable, Dimensions } from "react-native";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+  Pressable,
+  Linking,
+  useWindowDimensions,
+} from "react-native";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { colors, spacing, radius, fs, fw, IMG } from "@/src/theme";
-import { Button, GlassCard, StatPill, Badge, SectionTitle } from "@/src/components/ui";
-import { api } from "@/src/api";
+import { Button, GlassCard } from "@/src/components/ui";
 
-const ROLES = [
-  {
-    id: "candidate",
-    title: "Candidate",
-    subtitle: "Register, verify, sit exams, view results",
-    icon: "person-circle-outline" as const,
-    route: "/candidate/register",
-  },
-  {
-    id: "vault",
-    title: "Vault Authority",
-    subtitle: "Multi-signature question paper release",
-    icon: "shield-checkmark-outline" as const,
-    route: "/vault",
-  },
-  {
-    id: "centre",
-    title: "Exam Centre",
-    subtitle: "Decrypt · Print · Chain-of-custody",
-    icon: "print-outline" as const,
-    route: "/centre",
-  },
-  {
-    id: "evaluator",
-    title: "Evaluator",
-    subtitle: "Blockchain-anchored evaluation",
-    icon: "create-outline" as const,
-    route: "/evaluator",
-  },
-  {
-    id: "analytics",
-    title: "Government Analytics",
-    subtitle: "National macro-view · incident feed",
-    icon: "stats-chart-outline" as const,
-    route: "/analytics",
-  },
-];
+// --- external links (edit these when you publish) ---
+const LINKS = {
+  pitchDeck: "https://drive.google.com/file/d/EXAMVAULT_PITCH_DECK/view",
+  whitepaper: "https://drive.google.com/file/d/EXAMVAULT_WHITEPAPER/view",
+  github: "https://github.com/",
+  email: "mailto:aadilwaseem234@gmail.com",
+  phone: "tel:+918920869628",
+};
 
-export default function Landing() {
+const openExt = (url: string) => Linking.openURL(url).catch(() => {});
+
+// --------- reusable section wrapper (centers content on wide web) ----------
+const MAX_W = 960;
+const Container: React.FC<{ children: React.ReactNode; wide?: number }> = ({ children, wide }) => {
+  const { width } = useWindowDimensions();
+  const maxW = wide ?? MAX_W;
+  return (
+    <View style={{ width: "100%", alignItems: "center", paddingHorizontal: spacing.lg }}>
+      <View style={{ width: "100%", maxWidth: Math.min(maxW, width) }}>{children}</View>
+    </View>
+  );
+};
+
+const SectionEyebrow: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <Text style={styles.eyebrow}>{children}</Text>
+);
+
+const SectionH2: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <Text style={styles.h2}>{children}</Text>
+);
+
+export default function MarketingLanding() {
   const router = useRouter();
-  const [stats, setStats] = useState<any | null>(null);
+  const { width } = useWindowDimensions();
+  const isWide = width >= 780;
 
+  // running counter on the hero stats
+  const [count, setCount] = useState(0);
   useEffect(() => {
-    api.stats().then(setStats).catch(() => {});
+    let raf: number;
+    const start = Date.now();
+    const anim = () => {
+      const p = Math.min(1, (Date.now() - start) / 1600);
+      setCount(Math.floor(30_412_780 * (0.9 + 0.1 * p)));
+      if (p < 1) raf = requestAnimationFrame(anim);
+    };
+    anim();
+    return () => cancelAnimationFrame(raf);
   }, []);
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.surface }}>
       <SafeAreaView edges={["top"]} style={{ flex: 1 }}>
         <ScrollView
-          contentContainerStyle={styles.scroll}
+          contentContainerStyle={{ paddingBottom: spacing.xxxl }}
           showsVerticalScrollIndicator={false}
-          testID="landing-scroll"
+          testID="marketing-scroll"
         >
-          {/* HERO */}
-          <View style={styles.hero}>
+          {/* ============================== HERO ============================== */}
+          <View style={[styles.hero, { minHeight: isWide ? 640 : 620 }]}>
             <Image source={{ uri: IMG.network }} style={StyleSheet.absoluteFill} contentFit="cover" />
             <LinearGradient
-              colors={["rgba(15,23,42,0.35)", "rgba(15,23,42,0.85)", "#0F172A"]}
-              locations={[0, 0.65, 1]}
+              colors={["rgba(15,23,42,0.35)", "rgba(15,23,42,0.75)", "#0F172A"]}
+              locations={[0, 0.6, 1]}
               style={StyleSheet.absoluteFill}
             />
-            <View style={styles.heroInner}>
-              <View style={styles.brandBadge}>
-                <View style={styles.brandDot} />
-                <Text style={styles.brandBadgeText}>GOV · DPI · v1.0</Text>
-              </View>
-              <Text style={styles.brand}>EXAMVAULT</Text>
-              <Text style={styles.brandSub}>
-                A Zero-Trust Digital Examination Infrastructure
-              </Text>
-              <Text style={styles.brandTag}>Secure. Transparent. Traceable. Trusted.</Text>
 
-              <View style={{ height: spacing.xl }} />
-              <Button
-                label="Explore Platform"
-                icon="arrow-forward"
-                testID="explore-platform-button"
-                onPress={() => router.push("/candidate/register")}
-              />
-              <View style={{ height: spacing.sm }} />
-              <Button
-                label="Watch Demo"
-                variant="secondary"
-                icon="play-outline"
-                testID="watch-demo-button"
-                onPress={() => router.push("/impact")}
-              />
-            </View>
-          </View>
-
-          {/* STATS */}
-          <View style={styles.section}>
-            <View style={{ flexDirection: "row", gap: spacing.md }}>
-              <StatPill
-                label="Students"
-                value={stats ? "30M+" : "—"}
-                testID="stat-students"
-              />
-              <StatPill
-                label="Exam Centres"
-                value={stats ? `${Math.round((stats.centres || 10248) / 100) / 10}K+` : "—"}
-                testID="stat-centres"
-              />
-            </View>
-            <View style={{ height: spacing.md }} />
-            <View style={{ flexDirection: "row", gap: spacing.md }}>
-              <StatPill label="Traceability" value="100%" testID="stat-trace" />
-              <StatPill label="Data Integrity" value="99.99%" testID="stat-integrity" />
-            </View>
-          </View>
-
-          {/* THE PROBLEM */}
-          <View style={styles.section}>
-            <SectionTitle title="The Problem" hint="Why examinations still leak" />
-            <GlassCard>
-              <Text style={styles.body}>
-                Question papers are physically printed, transported and stored across thousands of centres —
-                creating windows for leaks, insider threats, impersonation and tampering.
-              </Text>
-              <View style={{ height: spacing.md }} />
-              <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
-                {[
-                  "Paper leaks",
-                  "Insider threats",
-                  "Impersonation",
-                  "Delayed investigations",
-                  "Public trust erosion",
-                ].map((t) => (
-                  <Badge key={t} label={t} tone="muted" icon="alert-circle-outline" />
-                ))}
-              </View>
-            </GlassCard>
-          </View>
-
-          {/* ROLE SELECT */}
-          <View style={styles.section}>
-            <SectionTitle title="Enter as" hint="Switch persona to explore the full lifecycle" />
-            <View style={{ gap: spacing.md }}>
-              {ROLES.map((r) => (
-                <Pressable
-                  key={r.id}
-                  onPress={() => router.push(r.route as any)}
-                  testID={`role-${r.id}`}
-                  style={({ pressed }) => [
-                    styles.roleCard,
-                    pressed && { transform: [{ scale: 0.995 }], borderColor: colors.brandPrimary },
-                  ]}
-                >
-                  <View style={styles.roleIcon}>
-                    <Ionicons name={r.icon} size={22} color={colors.brandPrimary} />
-                  </View>
-                  <View style={{ flex: 1 }}>
-                    <Text style={styles.roleTitle}>{r.title}</Text>
-                    <Text style={styles.roleSub}>{r.subtitle}</Text>
-                  </View>
-                  <Ionicons name="chevron-forward" size={18} color={colors.onSurfaceTertiary} />
-                </Pressable>
-              ))}
-            </View>
-          </View>
-
-          {/* VERIFY CTA */}
-          <View style={styles.section}>
-            <GlassCard>
-              <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.md }}>
-                <Ionicons name="ribbon-outline" size={22} color={colors.success} />
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.body}>Verify a certificate publicly</Text>
-                  <Text style={styles.mut}>Anyone can validate blockchain-anchored certificates.</Text>
+            {/* Top nav */}
+            <Container wide={1120}>
+              <View style={styles.topNav}>
+                <View style={styles.brandBadge}>
+                  <View style={styles.brandDot} />
+                  <Text style={styles.brandBadgeText}>GOV · DPI · v1.0</Text>
+                </View>
+                <View style={styles.navLinks}>
+                  {isWide && (
+                    <>
+                      <NavLink label="About" onPress={() => scrollTo("about")} />
+                      <NavLink label="Problem" onPress={() => scrollTo("problem")} />
+                      <NavLink label="Architecture" onPress={() => scrollTo("arch")} />
+                      <NavLink label="Prototype" onPress={() => router.push("/prototype")} />
+                    </>
+                  )}
+                  <Pressable
+                    onPress={() => router.push("/prototype")}
+                    style={styles.navCta}
+                    testID="nav-try-prototype"
+                  >
+                    <Text style={styles.navCtaT}>Try Prototype</Text>
+                    <Ionicons name="arrow-forward" size={14} color={colors.surface} />
+                  </Pressable>
                 </View>
               </View>
-              <View style={{ height: spacing.md }} />
-              <Button
-                label="Verify Certificate"
-                variant="ghost"
-                icon="shield-checkmark-outline"
-                testID="verify-cert-cta"
-                onPress={() => router.push("/verify")}
-              />
-            </GlassCard>
+            </Container>
+
+            {/* Hero content */}
+            <Container wide={1120}>
+              <View style={[styles.heroInner, { paddingTop: isWide ? 72 : 40 }]}>
+                <Text style={[styles.brand, isWide && { fontSize: 72 }]}>EXAMVAULT</Text>
+                <Text style={[styles.brandSub, isWide && { fontSize: 22 }]}>
+                  A Zero-Trust Digital Examination Infrastructure
+                </Text>
+                <Text style={styles.brandTag}>Secure. Transparent. Traceable. Trusted.</Text>
+
+                <View style={{ height: spacing.xl }} />
+                <View style={{ flexDirection: isWide ? "row" : "column", gap: spacing.md, alignSelf: "flex-start" }}>
+                  <Button
+                    label="Try Live Prototype"
+                    icon="rocket-outline"
+                    testID="hero-try-prototype"
+                    onPress={() => router.push("/prototype")}
+                    style={{ minWidth: 200 }}
+                  />
+                  <Button
+                    label="Watch the Story"
+                    variant="secondary"
+                    icon="play-outline"
+                    onPress={() => scrollTo("about")}
+                    style={{ minWidth: 180 }}
+                    testID="hero-watch-story"
+                  />
+                </View>
+              </View>
+            </Container>
           </View>
 
-          <Text style={styles.foot}>Central Examination Board · Government of India · Prototype 2028</Text>
+          {/* ============================== HERO STATS ============================== */}
+          <Container wide={1080}>
+            <View style={{ marginTop: -40 }}>
+              <View style={[styles.statRow, !isWide && { flexWrap: "wrap" }]}>
+                <StatBig value={`${(count / 1_000_000).toFixed(1)}M+`} label="Registered candidates" />
+                <StatBig value="10,248" label="Exam centres" />
+                <StatBig value="99.99%" label="Data integrity" />
+                <StatBig value="100%" label="Traceability" />
+              </View>
+            </View>
+          </Container>
+
+          {/* ============================== ABOUT ============================== */}
+          <View nativeID="about" style={{ marginTop: spacing.xxxl }}>
+            <Container>
+              <SectionEyebrow>ABOUT · 01</SectionEyebrow>
+              <SectionH2>What is ExamVault?</SectionH2>
+              <Text style={styles.lead}>
+                ExamVault is a next-generation Digital Public Infrastructure (DPI) that secures the
+                entire high-stakes examination lifecycle with AI, Blockchain, Cryptography and Zero-Trust
+                architecture — replacing physical trust with cryptographic trust.
+              </Text>
+              <View style={{ height: spacing.xl }} />
+              <View style={[styles.gridCards, !isWide && { flexDirection: "column" }]}>
+                <FeatureCard icon="shield-checkmark-outline" title="Zero Trust" body="Every action authenticated, authorised, encrypted, digitally signed and audit-logged." />
+                <FeatureCard icon="cube-outline" title="Blockchain" body="Immutable custody trails, tamper-evident evaluation, on-chain certificate anchoring." />
+                <FeatureCard icon="sparkles-outline" title="AI Verification" body="Face + liveness + duplicate detection at 4.8s p95 across 10,000+ centres." />
+              </View>
+            </Container>
+          </View>
+
+          {/* ============================== PROBLEM ============================== */}
+          <View nativeID="problem" style={{ marginTop: spacing.xxxl }}>
+            <Container>
+              <SectionEyebrow>PROBLEM · 02</SectionEyebrow>
+              <SectionH2>Why examinations still leak</SectionH2>
+              <Text style={styles.lead}>
+                Question papers are physically printed, transported and stored across thousands of centres —
+                creating windows for leaks, insider threats, impersonation and tampering. Even after tighter
+                controls, the process itself remains the weakness.
+              </Text>
+              <View style={{ height: spacing.xl }} />
+              <View style={[styles.gridCards, !isWide && { flexDirection: "column" }]}>
+                <ProblemCard n="01" title="Paper leaks" body="Printed masters travel hundreds of miles before being locked in vaults." />
+                <ProblemCard n="02" title="Insider threats" body="Every hand-off is an opportunity — printers, couriers, storage, unlockers." />
+                <ProblemCard n="03" title="Delayed investigations" body="Physical audit trails are slow, brittle, and often after-the-fact." />
+              </View>
+              <View style={{ height: spacing.lg }} />
+              <GlassCard>
+                <View style={{ flexDirection: "row", alignItems: "flex-start", gap: spacing.md }}>
+                  <Ionicons name="alert-circle-outline" size={22} color={colors.warning} />
+                  <Text style={styles.body}>
+                    The NEET paper leak controversy (India) highlighted a systemic truth: additional
+                    physical security cannot fix a fundamentally physical process. The remedy must be
+                    architectural — replace transport with cryptography.
+                  </Text>
+                </View>
+              </GlassCard>
+            </Container>
+          </View>
+
+          {/* ============================== ARCHITECTURE ============================== */}
+          <View nativeID="arch" style={{ marginTop: spacing.xxxl }}>
+            <Container>
+              <SectionEyebrow>ARCHITECTURE · 03</SectionEyebrow>
+              <SectionH2>How the trust flows</SectionH2>
+              <Text style={styles.lead}>
+                Six cryptographically-linked stages replace the physical supply chain of question papers,
+                answer sheets and results.
+              </Text>
+              <View style={{ height: spacing.xl }} />
+              <View style={{ gap: spacing.md }}>
+                {[
+                  { icon: "lock-closed-outline", t: "Question Paper Development", d: "Prepared inside secure facility · AES-256 encrypted at source · no admin can read the plaintext." },
+                  { icon: "key-outline", t: "Multi-Signature Digital Vault", d: "3-of-5 threshold cryptography · release requires quorum of independent authorities." },
+                  { icon: "print-outline", t: "Secure Local Printing", d: "Decrypt 45m before exam · CCTV-verified · every copy carries a unique QR + invisible watermark." },
+                  { icon: "person-outline", t: "Candidate Authentication", d: "AI face-match + liveness + government ID + seat confirmation in under 5s." },
+                  { icon: "git-network-outline", t: "Answer Sheet Custody", d: "Each sheet hashed + chained across evaluation nodes with full provenance." },
+                  { icon: "ribbon-outline", t: "Transparent Results", d: "Scanned evaluated sheets visible to student · certificates anchored on chain · public verifier for institutions." },
+                ].map((s, i) => (
+                  <View key={i} style={styles.archRow}>
+                    <View style={styles.archIdx}>
+                      <Text style={styles.archIdxT}>{String(i + 1).padStart(2, "0")}</Text>
+                    </View>
+                    <View style={styles.archIconBox}>
+                      <Ionicons name={s.icon as any} size={20} color={colors.brandPrimary} />
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.archT}>{s.t}</Text>
+                      <Text style={styles.archD}>{s.d}</Text>
+                    </View>
+                  </View>
+                ))}
+              </View>
+            </Container>
+          </View>
+
+          {/* ============================== TRY PROTOTYPE ============================== */}
+          <View style={{ marginTop: spacing.xxxl }}>
+            <Container>
+              <View style={styles.tryCard}>
+                <LinearGradient
+                  colors={["rgba(56,189,248,0.24)", "rgba(6,182,212,0.06)", "rgba(15,23,42,0.95)"]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={StyleSheet.absoluteFill}
+                />
+                <View style={{ padding: isWide ? spacing.xxl : spacing.xl }}>
+                  <SectionEyebrow>DEMO · 04</SectionEyebrow>
+                  <SectionH2>Try the live prototype</SectionH2>
+                  <Text style={styles.lead}>
+                    Explore the full lifecycle across 5 personas — Candidate, Vault Authority, Exam Centre,
+                    Evaluator and Government Analytics. Sign the 3-of-5 vault, watch the AES-256 ceremony,
+                    print papers with per-copy watermarks, and verify a certificate publicly.
+                  </Text>
+                  <View style={{ height: spacing.lg }} />
+                  <View style={{ flexDirection: isWide ? "row" : "column", gap: spacing.md, flexWrap: "wrap" }}>
+                    <Chip icon="person-circle-outline" label="Candidate" onPress={() => router.push("/candidate/register")} />
+                    <Chip icon="shield-checkmark-outline" label="Vault Authority" onPress={() => router.push("/vault")} />
+                    <Chip icon="print-outline" label="Exam Centre" onPress={() => router.push("/centre")} />
+                    <Chip icon="create-outline" label="Evaluator" onPress={() => router.push("/evaluator")} />
+                    <Chip icon="stats-chart-outline" label="Analytics" onPress={() => router.push("/analytics")} />
+                  </View>
+                  <View style={{ height: spacing.xl }} />
+                  <Button
+                    label="Launch Prototype"
+                    icon="rocket-outline"
+                    onPress={() => router.push("/prototype")}
+                    testID="cta-launch-prototype"
+                    style={{ alignSelf: "flex-start", minWidth: 220 }}
+                  />
+                </View>
+              </View>
+            </Container>
+          </View>
+
+          {/* ============================== RESOURCES ============================== */}
+          <View style={{ marginTop: spacing.xxxl }}>
+            <Container>
+              <SectionEyebrow>RESOURCES · 05</SectionEyebrow>
+              <SectionH2>Read the story in depth</SectionH2>
+              <View style={{ height: spacing.lg }} />
+              <View style={[styles.gridCards, !isWide && { flexDirection: "column" }]}>
+                <ResourceCard
+                  icon="easel-outline"
+                  title="Pitch Deck"
+                  body="15-slide investor / government pitch."
+                  cta="Open deck"
+                  onPress={() => openExt(LINKS.pitchDeck)}
+                  testID="res-pitchdeck"
+                />
+                <ResourceCard
+                  icon="document-text-outline"
+                  title="Whitepaper"
+                  body="Technical whitepaper: cryptography, threshold vault, chain design."
+                  cta="Read paper"
+                  onPress={() => openExt(LINKS.whitepaper)}
+                  testID="res-whitepaper"
+                />
+                <ResourceCard
+                  icon="logo-github"
+                  title="GitHub"
+                  body="Source code, issues, roadmap."
+                  cta="View repo"
+                  onPress={() => openExt(LINKS.github)}
+                  testID="res-github"
+                />
+              </View>
+            </Container>
+          </View>
+
+          {/* ============================== CONTACT ============================== */}
+          <View style={{ marginTop: spacing.xxxl }}>
+            <Container>
+              <SectionEyebrow>CONTACT · 06</SectionEyebrow>
+              <SectionH2>Get in touch</SectionH2>
+              <Text style={styles.lead}>
+                For partnerships, pilots or press — reach out. We reply within one working day.
+              </Text>
+              <View style={{ height: spacing.lg }} />
+              <View style={[styles.gridCards, !isWide && { flexDirection: "column" }]}>
+                <ContactCard
+                  icon="mail-outline"
+                  label="Email"
+                  value="aadilwaseem234@gmail.com"
+                  onPress={() => openExt(LINKS.email)}
+                  testID="contact-email"
+                />
+                <ContactCard
+                  icon="call-outline"
+                  label="Phone"
+                  value="+91 8920869628"
+                  onPress={() => openExt(LINKS.phone)}
+                  testID="contact-phone"
+                />
+              </View>
+            </Container>
+          </View>
+
+          {/* ============================== FOOTER ============================== */}
+          <View style={{ marginTop: spacing.xxxl, paddingVertical: spacing.xl }}>
+            <Container>
+              <View
+                style={{
+                  borderTopWidth: StyleSheet.hairlineWidth,
+                  borderTopColor: colors.border,
+                  paddingTop: spacing.lg,
+                  flexDirection: isWide ? "row" : "column",
+                  justifyContent: "space-between",
+                  alignItems: isWide ? "center" : "flex-start",
+                  gap: spacing.md,
+                }}
+              >
+                <Text style={styles.foot}>© 2028 ExamVault · Prototype for public benefit</Text>
+                <Text style={styles.foot}>Central Examination Board · Government of India</Text>
+              </View>
+            </Container>
+          </View>
         </ScrollView>
       </SafeAreaView>
     </View>
   );
 }
 
-const { width } = Dimensions.get("window");
+// -------- Section-scroll helper for web anchors --------
+function scrollTo(id: string) {
+  if (typeof document === "undefined") return;
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+}
 
+// ------------------------------ subcomponents ------------------------------
+const NavLink: React.FC<{ label: string; onPress: () => void }> = ({ label, onPress }) => (
+  <Pressable onPress={onPress} style={styles.navLink}>
+    <Text style={styles.navLinkT}>{label}</Text>
+  </Pressable>
+);
+
+const StatBig: React.FC<{ value: string; label: string }> = ({ value, label }) => (
+  <View style={styles.statBig}>
+    <Text style={styles.statBigV}>{value}</Text>
+    <Text style={styles.statBigL}>{label}</Text>
+  </View>
+);
+
+const FeatureCard: React.FC<{ icon: any; title: string; body: string }> = ({ icon, title, body }) => (
+  <View style={styles.featCard}>
+    <View style={styles.featIcon}>
+      <Ionicons name={icon} size={20} color={colors.brandPrimary} />
+    </View>
+    <Text style={styles.featT}>{title}</Text>
+    <Text style={styles.featB}>{body}</Text>
+  </View>
+);
+
+const ProblemCard: React.FC<{ n: string; title: string; body: string }> = ({ n, title, body }) => (
+  <View style={styles.probCard}>
+    <Text style={styles.probN}>{n}</Text>
+    <Text style={styles.probT}>{title}</Text>
+    <Text style={styles.probB}>{body}</Text>
+  </View>
+);
+
+const Chip: React.FC<{ icon: any; label: string; onPress: () => void }> = ({ icon, label, onPress }) => (
+  <Pressable onPress={onPress} style={styles.chip}>
+    <Ionicons name={icon} size={14} color={colors.brandPrimary} />
+    <Text style={styles.chipT}>{label}</Text>
+  </Pressable>
+);
+
+const ResourceCard: React.FC<{ icon: any; title: string; body: string; cta: string; onPress: () => void; testID?: string }> = ({
+  icon,
+  title,
+  body,
+  cta,
+  onPress,
+  testID,
+}) => (
+  <Pressable onPress={onPress} style={styles.resCard} testID={testID}>
+    <View style={styles.resIcon}>
+      <Ionicons name={icon} size={20} color={colors.brandPrimary} />
+    </View>
+    <Text style={styles.featT}>{title}</Text>
+    <Text style={styles.featB}>{body}</Text>
+    <View style={{ height: spacing.sm }} />
+    <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+      <Text style={styles.resCta}>{cta}</Text>
+      <Ionicons name="arrow-forward" size={14} color={colors.brandPrimary} />
+    </View>
+  </Pressable>
+);
+
+const ContactCard: React.FC<{ icon: any; label: string; value: string; onPress: () => void; testID?: string }> = ({
+  icon,
+  label,
+  value,
+  onPress,
+  testID,
+}) => (
+  <Pressable onPress={onPress} style={styles.contactCard} testID={testID}>
+    <View style={styles.contactIcon}>
+      <Ionicons name={icon} size={20} color={colors.brandPrimary} />
+    </View>
+    <View style={{ flex: 1 }}>
+      <Text style={styles.contactL}>{label}</Text>
+      <Text style={styles.contactV}>{value}</Text>
+    </View>
+    <Ionicons name="arrow-forward" size={16} color={colors.onSurfaceTertiary} />
+  </Pressable>
+);
+
+// ------------------------------ styles ------------------------------
 const styles = StyleSheet.create({
-  scroll: { paddingBottom: spacing.xxxl },
-  hero: {
-    height: Math.min(560, width * 1.15),
-    overflow: "hidden",
-    justifyContent: "flex-end",
-    marginBottom: spacing.lg,
+  hero: { overflow: "hidden", justifyContent: "flex-start" },
+  topNav: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingTop: spacing.md,
+    paddingBottom: spacing.sm,
   },
-  heroInner: { padding: spacing.xl, paddingBottom: spacing.xxl },
+  navLinks: { flexDirection: "row", alignItems: "center", gap: spacing.md },
+  navLink: { paddingHorizontal: 8, paddingVertical: 6 },
+  navLinkT: { color: colors.onSurfaceSecondary, fontSize: fs.sm, letterSpacing: 0.4 },
+  navCta: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    borderRadius: radius.pill,
+    backgroundColor: colors.brandPrimary,
+  },
+  navCtaT: { color: colors.surface, fontSize: fs.sm, fontWeight: fw.medium, letterSpacing: 0.4 },
   brandBadge: {
     flexDirection: "row",
     alignItems: "center",
@@ -221,7 +487,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "rgba(56,189,248,0.35)",
     backgroundColor: "rgba(56,189,248,0.12)",
-    marginBottom: spacing.lg,
   },
   brandDot: {
     width: 8,
@@ -233,13 +498,69 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
   },
   brandBadgeText: { color: colors.brandPrimary, fontSize: fs.sm, letterSpacing: 1.4, fontWeight: fw.medium },
-  brand: { color: colors.onSurface, fontSize: fs["4xl"], fontWeight: fw.medium, letterSpacing: 4 },
-  brandSub: { color: colors.onSurfaceSecondary, fontSize: fs.lg, marginTop: spacing.sm, letterSpacing: 0.3 },
+  heroInner: { paddingBottom: spacing.xxl },
+  brand: { color: colors.onSurface, fontSize: 48, fontWeight: fw.medium, letterSpacing: 4 },
+  brandSub: { color: colors.onSurfaceSecondary, fontSize: fs.lg, marginTop: spacing.sm, letterSpacing: 0.3, maxWidth: 620 },
   brandTag: { color: colors.brandPrimary, fontSize: fs.base, marginTop: spacing.md, letterSpacing: 1.2 },
-  section: { paddingHorizontal: spacing.lg, marginBottom: spacing.xl },
-  body: { color: colors.onSurface, fontSize: fs.base, lineHeight: 22 },
-  mut: { color: colors.onSurfaceTertiary, fontSize: fs.sm, marginTop: 4 },
-  roleCard: {
+
+  statRow: { flexDirection: "row", gap: spacing.md },
+  statBig: {
+    flex: 1,
+    minWidth: 150,
+    padding: spacing.lg,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: "rgba(30,41,59,0.85)",
+  },
+  statBigV: { color: colors.onSurface, fontSize: fs["2xl"], fontWeight: fw.medium, letterSpacing: 0.5 },
+  statBigL: { color: colors.onSurfaceTertiary, fontSize: fs.sm, marginTop: 4, letterSpacing: 0.5 },
+
+  eyebrow: { color: colors.brandPrimary, fontSize: fs.sm, letterSpacing: 2.4, fontWeight: fw.medium },
+  h2: { color: colors.onSurface, fontSize: fs["3xl"], fontWeight: fw.medium, letterSpacing: 0.4, marginTop: 8, marginBottom: spacing.md },
+  lead: { color: colors.onSurfaceSecondary, fontSize: fs.lg, lineHeight: 26, maxWidth: 720 },
+  body: { color: colors.onSurface, fontSize: fs.base, lineHeight: 22, flex: 1 },
+
+  gridCards: { flexDirection: "row", gap: spacing.md, flexWrap: "wrap" },
+  featCard: {
+    flex: 1,
+    minWidth: 240,
+    padding: spacing.lg,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: "rgba(30,41,59,0.55)",
+    gap: spacing.sm,
+  },
+  featIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: "rgba(56,189,248,0.35)",
+    backgroundColor: colors.brandGlow,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: spacing.sm,
+  },
+  featT: { color: colors.onSurface, fontSize: fs.lg, fontWeight: fw.medium },
+  featB: { color: colors.onSurfaceTertiary, fontSize: fs.base, lineHeight: 22 },
+
+  probCard: {
+    flex: 1,
+    minWidth: 240,
+    padding: spacing.lg,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: "rgba(30,41,59,0.55)",
+    gap: 6,
+  },
+  probN: { color: colors.brandPrimary, fontSize: fs.sm, letterSpacing: 2, fontFamily: "Menlo", fontWeight: fw.medium },
+  probT: { color: colors.onSurface, fontSize: fs.lg, fontWeight: fw.medium, marginTop: 4 },
+  probB: { color: colors.onSurfaceTertiary, fontSize: fs.base, lineHeight: 22 },
+
+  archRow: {
     flexDirection: "row",
     alignItems: "center",
     gap: spacing.md,
@@ -249,7 +570,60 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     backgroundColor: "rgba(30,41,59,0.55)",
   },
-  roleIcon: {
+  archIdx: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "rgba(56,189,248,0.35)",
+    backgroundColor: colors.brandGlow,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  archIdxT: { color: colors.brandPrimary, fontSize: fs.sm, fontFamily: "Menlo", fontWeight: fw.medium },
+  archIconBox: {
+    width: 40,
+    height: 40,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.surfaceSecondary,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  archT: { color: colors.onSurface, fontSize: fs.lg, fontWeight: fw.medium },
+  archD: { color: colors.onSurfaceTertiary, fontSize: fs.base, marginTop: 4, lineHeight: 22 },
+
+  tryCard: {
+    borderRadius: radius.lg,
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: "rgba(56,189,248,0.35)",
+  },
+  chip: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: radius.pill,
+    borderWidth: 1,
+    borderColor: "rgba(56,189,248,0.35)",
+    backgroundColor: colors.brandGlow,
+  },
+  chipT: { color: colors.brandPrimary, fontSize: fs.sm, fontWeight: fw.medium, letterSpacing: 0.4 },
+
+  resCard: {
+    flex: 1,
+    minWidth: 240,
+    padding: spacing.lg,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: "rgba(30,41,59,0.55)",
+    gap: 8,
+  },
+  resIcon: {
     width: 44,
     height: 44,
     borderRadius: radius.md,
@@ -258,14 +632,34 @@ const styles = StyleSheet.create({
     backgroundColor: colors.brandGlow,
     alignItems: "center",
     justifyContent: "center",
+    marginBottom: 4,
   },
-  roleTitle: { color: colors.onSurface, fontSize: fs.lg, fontWeight: fw.medium },
-  roleSub: { color: colors.onSurfaceTertiary, fontSize: fs.sm, marginTop: 2 },
-  foot: {
-    color: colors.onSurfaceTertiary,
-    fontSize: fs.sm,
-    textAlign: "center",
-    letterSpacing: 0.6,
-    marginTop: spacing.md,
+  resCta: { color: colors.brandPrimary, fontSize: fs.base, fontWeight: fw.medium },
+
+  contactCard: {
+    flex: 1,
+    minWidth: 240,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.md,
+    padding: spacing.lg,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: "rgba(30,41,59,0.55)",
   },
+  contactIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    borderWidth: 1,
+    borderColor: "rgba(56,189,248,0.35)",
+    backgroundColor: colors.brandGlow,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  contactL: { color: colors.onSurfaceTertiary, fontSize: fs.sm, letterSpacing: 0.4 },
+  contactV: { color: colors.onSurface, fontSize: fs.base, fontWeight: fw.medium, marginTop: 2 },
+
+  foot: { color: colors.onSurfaceTertiary, fontSize: fs.sm, letterSpacing: 0.4 },
 });
