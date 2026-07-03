@@ -407,13 +407,13 @@ export default function MarketingLanding() {
                       <View style={styles.cmpIconL}>
                         <Ionicons name={row.li as any} size={16} color={colors.error} />
                       </View>
-                      <Text style={styles.cmpLeftT} numberOfLines={2}>{row.l}</Text>
+                      <Text style={styles.cmpLeftT}>{row.l}</Text>
                     </View>
                     <View style={[styles.cmpCell, styles.cmpCellRight]}>
                       <View style={styles.cmpIconR}>
                         <Ionicons name={row.ri as any} size={16} color={colors.success} />
                       </View>
-                      <Text style={styles.cmpRightT} numberOfLines={2}>{row.r}</Text>
+                      <Text style={styles.cmpRightT}>{row.r}</Text>
                     </View>
                   </View>
                 </Reveal>
@@ -929,7 +929,7 @@ const styles = StyleSheet.create({
   },
   cmpRow: {
     flexDirection: "row",
-    gap: spacing.sm,
+    gap: spacing.md,
     marginBottom: spacing.sm,
   },
   cmpCell: {
@@ -937,7 +937,7 @@ const styles = StyleSheet.create({
     minWidth: 0,
     flexDirection: "row",
     alignItems: "center",
-    gap: spacing.sm,
+    gap: spacing.md,
     padding: spacing.md,
     borderRadius: radius.md,
     borderWidth: 1,
