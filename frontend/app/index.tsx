@@ -75,7 +75,7 @@ export default function MarketingLanding() {
       } as any)
     : { fontSize: 44, letterSpacing: 3 };
   const heroSubStyle = Platform.OS === "web"
-    ? ({ fontSize: "clamp(15px, 2.2vw, 22px)", lineHeight: 1.5, wordBreak: "normal", overflowWrap: "break-word" } as any)
+    ? ({ fontSize: "clamp(15px, 2.2vw, 22px)", lineHeight: 26, wordBreak: "normal", overflowWrap: "break-word" } as any)
     : { fontSize: 18, lineHeight: 26 };
 
   // running counter on the hero stats

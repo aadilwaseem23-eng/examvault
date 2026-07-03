@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { ScrollView, StyleSheet, Text, View, Pressable, Dimensions } from "react-native";
+import { ScrollView, StyleSheet, Text, View, Pressable, Platform } from "react-native";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -76,7 +76,14 @@ export default function Landing() {
                 <View style={styles.brandDot} />
                 <Text style={styles.brandBadgeText}>GOV · DPI · v1.0</Text>
               </View>
-              <Text style={styles.brand}>EXAMVAULT</Text>
+              <Text
+                numberOfLines={1}
+                allowFontScaling={false}
+                accessibilityRole="header"
+                aria-level={1}
+                dataSet={{ examvaultHero: "true" }}
+                style={styles.brand}
+              >EXAMVAULT</Text>
               <Text style={styles.brandSub}>
                 A Zero-Trust Digital Examination Infrastructure
               </Text>
@@ -199,12 +206,13 @@ export default function Landing() {
   );
 }
 
-const { width } = Dimensions.get("window");
-
 const styles = StyleSheet.create({
   scroll: { paddingBottom: spacing.xxxl },
   hero: {
-    height: Math.min(560, width * 1.15),
+    // Use CSS clamp on web (hydration-safe), fixed height on native (no SSR).
+    ...(Platform.OS === "web"
+      ? ({ height: "clamp(440px, 90vw, 620px)" } as any)
+      : { height: 520 }),
     overflow: "hidden",
     justifyContent: "flex-end",
     marginBottom: spacing.lg,
@@ -233,8 +241,14 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
   },
   brandBadgeText: { color: colors.brandPrimary, fontSize: fs.sm, letterSpacing: 1.4, fontWeight: fw.medium },
-  brand: { color: colors.onSurface, fontSize: fs["4xl"], fontWeight: fw.medium, letterSpacing: 4 },
-  brandSub: { color: colors.onSurfaceSecondary, fontSize: fs.lg, marginTop: spacing.sm, letterSpacing: 0.3 },
+  brand: {
+    color: colors.onSurface,
+    fontWeight: fw.medium,
+    ...(Platform.OS === "web"
+      ? ({ fontSize: "clamp(2rem, 10vw, 3.25rem)", letterSpacing: "clamp(1.5px, 0.6vw, 4px)", whiteSpace: "nowrap", wordBreak: "keep-all", overflowWrap: "normal", display: "block", maxWidth: "100vw" } as any)
+      : { fontSize: fs["4xl"], letterSpacing: 4 }),
+  },
+  brandSub: { color: colors.onSurfaceSecondary, fontSize: fs.lg, marginTop: spacing.sm, letterSpacing: 0.3, lineHeight: 24 },
   brandTag: { color: colors.brandPrimary, fontSize: fs.base, marginTop: spacing.md, letterSpacing: 1.2 },
   section: { paddingHorizontal: spacing.lg, marginBottom: spacing.xl },
   body: { color: colors.onSurface, fontSize: fs.base, lineHeight: 22 },

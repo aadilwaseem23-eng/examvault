@@ -160,10 +160,12 @@ export default function DecryptCeremony() {
   const [progress, setProgress] = useState(0);
   const [logs, setLogs] = useState<string[]>([]);
   const [fingerprint, setFingerprint] = useState<string | null>(null);
-  const [hexLines, setHexLines] = useState<string[]>(Array.from({ length: 5 }, () => randomHex(48)));
+  const [hexLines, setHexLines] = useState<string[]>(() => ["", "", "", "", ""]);
   const iv = useRef<any>(null);
 
   useEffect(() => {
+    // Seed random hex only on the client (avoids SSR/CSR hydration mismatch)
+    setHexLines(Array.from({ length: 5 }, () => randomHex(48)));
     const t = setInterval(() => {
       setHexLines((prev) => {
         const next = [...prev.slice(1), randomHex(48)];
