@@ -394,26 +394,43 @@ export default function MarketingLanding() {
                 </View>
               </View>
 
-              {[
-                { l: "Physical paper transportation", r: "Encrypted digital distribution", li: "cube-outline", ri: "cloud-upload-outline" },
-                { l: "Manual identity verification", r: "AI-assisted identity verification", li: "eye-off-outline", ri: "sparkles-outline" },
-                { l: "Multiple leak points", r: "Multi-Signature Digital Vault", li: "warning-outline", ri: "lock-closed-outline" },
-                { l: "Difficult investigations", r: "Immutable blockchain audit trail", li: "search-outline", ri: "cube-outline" },
-                { l: "Manual certificate verification", r: "Instant blockchain verification", li: "document-outline", ri: "flash-outline" },
-              ].map((row, i) => (
-                <Reveal key={i} delay={i * 90} translate={22}>
-                  <View style={styles.cmpRow}>
-                    <View style={styles.cmpIconL}>
-                      <Ionicons name={row.li as any} size={18} color={colors.error} />
+              {(() => {
+                const rows = [
+                  { l: "Physical paper transportation", r: "Encrypted digital distribution", li: "cube-outline", ri: "cloud-upload-outline" },
+                  { l: "Manual identity verification", r: "AI-assisted identity verification", li: "eye-off-outline", ri: "sparkles-outline" },
+                  { l: "Multiple leak points", r: "Multi-Signature Digital Vault", li: "warning-outline", ri: "lock-closed-outline" },
+                  { l: "Difficult investigations", r: "Immutable blockchain audit trail", li: "search-outline", ri: "cube-outline" },
+                  { l: "Manual certificate verification", r: "Instant blockchain verification", li: "document-outline", ri: "flash-outline" },
+                ];
+                return (
+                  <View style={styles.cmpGrid}>
+                    <View style={styles.cmpCol}>
+                      {rows.map((row, i) => (
+                        <Reveal key={`l-${i}`} delay={i * 90} translate={22}>
+                          <View style={[styles.cmpBox, styles.cmpBoxLeft]}>
+                            <View style={styles.cmpIconL}>
+                              <Ionicons name={row.li as any} size={18} color={colors.error} />
+                            </View>
+                            <Text style={styles.cmpLeftT}>{row.l}</Text>
+                          </View>
+                        </Reveal>
+                      ))}
                     </View>
-                    <Text style={styles.cmpLeftT} numberOfLines={2}>{row.l}</Text>
-                    <View style={styles.cmpIconR}>
-                      <Ionicons name={row.ri as any} size={18} color={colors.success} />
+                    <View style={styles.cmpCol}>
+                      {rows.map((row, i) => (
+                        <Reveal key={`r-${i}`} delay={i * 90} translate={22}>
+                          <View style={[styles.cmpBox, styles.cmpBoxRight]}>
+                            <View style={styles.cmpIconR}>
+                              <Ionicons name={row.ri as any} size={18} color={colors.success} />
+                            </View>
+                            <Text style={styles.cmpRightT}>{row.r}</Text>
+                          </View>
+                        </Reveal>
+                      ))}
                     </View>
-                    <Text style={styles.cmpRightT} numberOfLines={2}>{row.r}</Text>
                   </View>
-                </Reveal>
-              ))}
+                );
+              })()}
             </Container>
           </View>
 
@@ -923,7 +940,16 @@ const styles = StyleSheet.create({
     letterSpacing: 1.6,
     textTransform: "uppercase",
   },
-  cmpRow: {
+  cmpGrid: {
+    flexDirection: "row",
+    gap: spacing.md,
+  },
+  cmpCol: {
+    flex: 1,
+    minWidth: 0,
+    gap: spacing.sm,
+  },
+  cmpBox: {
     flexDirection: "row",
     alignItems: "center",
     gap: spacing.md,
@@ -931,9 +957,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     borderRadius: radius.md,
     borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: "rgba(30,41,59,0.5)",
-    marginBottom: spacing.sm,
+    minHeight: 68,
+  },
+  cmpBoxLeft: {
+    borderColor: "rgba(239,68,68,0.18)",
+    backgroundColor: "rgba(239,68,68,0.04)",
+  },
+  cmpBoxRight: {
+    borderColor: "rgba(16,185,129,0.28)",
+    backgroundColor: "rgba(16,185,129,0.05)",
   },
   cmpIconL: {
     width: 40,
@@ -967,10 +999,12 @@ const styles = StyleSheet.create({
     flexShrink: 0,
   },
   cmpLeftT: {
-    color: colors.onSurface,
+    color: colors.onSurfaceSecondary,
     fontSize: fs.base,
     flex: 1,
     minWidth: 0,
+    textDecorationLine: "line-through",
+    textDecorationColor: "rgba(239,68,68,0.55)",
   },
   cmpRightT: {
     color: colors.onSurface,
