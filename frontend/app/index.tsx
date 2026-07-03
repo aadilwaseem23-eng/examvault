@@ -13,8 +13,10 @@ import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import Head from "expo-router/head";
 import { colors, spacing, radius, fs, fw, IMG } from "@/src/theme";
 import { Button, GlassCard } from "@/src/components/ui";
+import { Reveal } from "@/src/components/reveal";
 
 // --- external links (edit these when you publish) ---
 const LINKS = {
@@ -68,6 +70,30 @@ export default function MarketingLanding() {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.surface }}>
+      <Head>
+        <title>ExamVault — Blockchain & AI Powered Examination Infrastructure</title>
+        <meta
+          name="description"
+          content="A Blockchain & AI Powered Examination Infrastructure for Secure, Transparent and Trusted Assessments. Multi-signature vaults, cryptographic paper distribution, on-chain certificates."
+        />
+        <meta name="theme-color" content="#0F172A" />
+        <meta property="og:title" content="ExamVault — Restoring Trust in High-Stakes Examinations" />
+        <meta
+          property="og:description"
+          content="Secure by design, not by trust. Every stage of an examination — from question paper to certificate — cryptographically bound."
+        />
+        <meta property="og:type" content="website" />
+        <meta property="og:image" content={IMG.network} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="ExamVault — Blockchain & AI Powered Examination Infrastructure" />
+        <meta
+          name="twitter:description"
+          content="Secure by design, not by trust. Multi-signature vaults · AI verification · Blockchain certificates."
+        />
+        <meta name="twitter:image" content={IMG.network} />
+      </Head>
       <SafeAreaView edges={["top"]} style={{ flex: 1 }}>
         <ScrollView
           contentContainerStyle={{ paddingBottom: spacing.xxxl }}
@@ -153,6 +179,30 @@ export default function MarketingLanding() {
               </View>
             </View>
           </Container>
+
+          {/* ============================== APPLICABLE ACROSS ============================== */}
+          <View style={{ marginTop: spacing.xxl }}>
+            <Container wide={1080}>
+              <Text style={styles.applicableK}>APPLICABLE ACROSS EVERY HIGH-STAKES ASSESSMENT</Text>
+              <View style={styles.applicableRow}>
+                {[
+                  { i: "school-outline", t: "University Entrance" },
+                  { i: "business-outline", t: "Civil Services" },
+                  { i: "cash-outline", t: "Banking Exams" },
+                  { i: "medkit-outline", t: "Medical & Nursing" },
+                  { i: "hammer-outline", t: "Engineering" },
+                  { i: "shield-outline", t: "Defence & Police" },
+                  { i: "briefcase-outline", t: "Professional Licensing" },
+                  { i: "globe-outline", t: "International Testing" },
+                ].map((c) => (
+                  <View key={c.t} style={styles.applicablePill}>
+                    <Ionicons name={c.i as any} size={14} color={colors.brandPrimary} />
+                    <Text style={styles.applicablePillT}>{c.t}</Text>
+                  </View>
+                ))}
+              </View>
+            </Container>
+          </View>
 
           {/* ============================== VISION ============================== */}
           <View style={{ marginTop: spacing.xxxl }}>
@@ -243,18 +293,20 @@ export default function MarketingLanding() {
                   { icon: "git-network-outline", t: "Answer Sheet Custody", d: "Each sheet hashed + chained across evaluation nodes with full provenance." },
                   { icon: "ribbon-outline", t: "Transparent Results", d: "Scanned evaluated sheets visible to student · certificates anchored on chain · public verifier for institutions." },
                 ].map((s, i) => (
-                  <View key={i} style={styles.archRow}>
-                    <View style={styles.archIdx}>
-                      <Text style={styles.archIdxT}>{String(i + 1).padStart(2, "0")}</Text>
+                  <Reveal key={i} delay={i * 70} translate={20}>
+                    <View style={styles.archRow}>
+                      <View style={styles.archIdx}>
+                        <Text style={styles.archIdxT}>{String(i + 1).padStart(2, "0")}</Text>
+                      </View>
+                      <View style={styles.archIconBox}>
+                        <Ionicons name={s.icon as any} size={20} color={colors.brandPrimary} />
+                      </View>
+                      <View style={{ flex: 1 }}>
+                        <Text style={styles.archT}>{s.t}</Text>
+                        <Text style={styles.archD}>{s.d}</Text>
+                      </View>
                     </View>
-                    <View style={styles.archIconBox}>
-                      <Ionicons name={s.icon as any} size={20} color={colors.brandPrimary} />
-                    </View>
-                    <View style={{ flex: 1 }}>
-                      <Text style={styles.archT}>{s.t}</Text>
-                      <Text style={styles.archD}>{s.d}</Text>
-                    </View>
-                  </View>
+                  </Reveal>
                 ))}
               </View>
             </Container>
@@ -290,25 +342,27 @@ export default function MarketingLanding() {
                 { l: "Difficult investigations", r: "Immutable blockchain audit trail", li: "search-outline", ri: "cube-outline" },
                 { l: "Manual certificate verification", r: "Instant blockchain verification", li: "document-outline", ri: "flash-outline" },
               ].map((row, i) => (
-                <View key={i} style={[styles.cmpRow, !isWide && { flexDirection: "column" }]}>
-                  <View style={[styles.cmpCell, styles.cmpCellLeft]}>
-                    <View style={styles.cmpIconL}>
-                      <Ionicons name={row.li as any} size={16} color={colors.error} />
+                <Reveal key={i} delay={i * 90} translate={22}>
+                  <View style={[styles.cmpRow, !isWide && { flexDirection: "column" }]}>
+                    <View style={[styles.cmpCell, styles.cmpCellLeft]}>
+                      <View style={styles.cmpIconL}>
+                        <Ionicons name={row.li as any} size={16} color={colors.error} />
+                      </View>
+                      <Text style={styles.cmpLeftT}>{row.l}</Text>
                     </View>
-                    <Text style={styles.cmpLeftT}>{row.l}</Text>
+                    {!isWide && (
+                      <View style={styles.cmpMobileArrow}>
+                        <Ionicons name="arrow-down" size={16} color={colors.brandPrimary} />
+                      </View>
+                    )}
+                    <View style={[styles.cmpCell, styles.cmpCellRight]}>
+                      <View style={styles.cmpIconR}>
+                        <Ionicons name={row.ri as any} size={16} color={colors.success} />
+                      </View>
+                      <Text style={styles.cmpRightT}>{row.r}</Text>
+                    </View>
                   </View>
-                  {!isWide && (
-                    <View style={styles.cmpMobileArrow}>
-                      <Ionicons name="arrow-down" size={16} color={colors.brandPrimary} />
-                    </View>
-                  )}
-                  <View style={[styles.cmpCell, styles.cmpCellRight]}>
-                    <View style={styles.cmpIconR}>
-                      <Ionicons name={row.ri as any} size={16} color={colors.success} />
-                    </View>
-                    <Text style={styles.cmpRightT}>{row.r}</Text>
-                  </View>
-                </View>
+                </Reveal>
               ))}
             </Container>
           </View>
@@ -847,5 +901,38 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginVertical: 4,
+  },
+
+  // Applicable-across strip
+  applicableK: {
+    color: colors.onSurfaceTertiary,
+    fontSize: fs.sm,
+    letterSpacing: 2.4,
+    fontWeight: fw.medium,
+    textAlign: "center",
+    marginBottom: spacing.md,
+  },
+  applicableRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    gap: spacing.sm,
+  },
+  applicablePill: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    borderRadius: radius.pill,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: "rgba(30,41,59,0.55)",
+  },
+  applicablePillT: {
+    color: colors.onSurfaceSecondary,
+    fontSize: fs.sm,
+    fontWeight: fw.medium,
+    letterSpacing: 0.4,
   },
 });
