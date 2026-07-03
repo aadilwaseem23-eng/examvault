@@ -402,23 +402,18 @@ export default function MarketingLanding() {
                 { l: "Manual certificate verification", r: "Instant blockchain verification", li: "document-outline", ri: "flash-outline" },
               ].map((row, i) => (
                 <Reveal key={i} delay={i * 90} translate={22}>
-                  <View style={[styles.cmpRow, !isWide && { flexDirection: "column" }]}>
+                  <View style={styles.cmpRow}>
                     <View style={[styles.cmpCell, styles.cmpCellLeft]}>
                       <View style={styles.cmpIconL}>
                         <Ionicons name={row.li as any} size={16} color={colors.error} />
                       </View>
-                      <Text style={styles.cmpLeftT}>{row.l}</Text>
+                      <Text style={styles.cmpLeftT} numberOfLines={2}>{row.l}</Text>
                     </View>
-                    {!isWide && (
-                      <View style={styles.cmpMobileArrow}>
-                        <Ionicons name="arrow-down" size={16} color={colors.brandPrimary} />
-                      </View>
-                    )}
                     <View style={[styles.cmpCell, styles.cmpCellRight]}>
                       <View style={styles.cmpIconR}>
                         <Ionicons name={row.ri as any} size={16} color={colors.success} />
                       </View>
-                      <Text style={styles.cmpRightT}>{row.r}</Text>
+                      <Text style={styles.cmpRightT} numberOfLines={2}>{row.r}</Text>
                     </View>
                   </View>
                 </Reveal>
@@ -934,14 +929,15 @@ const styles = StyleSheet.create({
   },
   cmpRow: {
     flexDirection: "row",
-    gap: spacing.md,
+    gap: spacing.sm,
     marginBottom: spacing.sm,
   },
   cmpCell: {
     flex: 1,
+    minWidth: 0,
     flexDirection: "row",
     alignItems: "center",
-    gap: spacing.md,
+    gap: spacing.sm,
     padding: spacing.md,
     borderRadius: radius.md,
     borderWidth: 1,
