@@ -26,6 +26,12 @@ export const api = {
     req("/vault/session/sign", { method: "POST", body: JSON.stringify({ authority_id }) }),
   vaultReset: () => req("/vault/session/reset", { method: "POST" }),
   centreDashboard: () => req("/centre/dashboard"),
+  centreDecrypt: () => req("/centre/decrypt", { method: "POST" }),
+  centrePaperPreview: () => req("/centre/paper-preview"),
+  printRun: () => req("/centre/print-run"),
+  printRunStart: () => req("/centre/print-run/start", { method: "POST" }),
+  printRunTick: () => req("/centre/print-run/tick"),
+  printRunReset: () => req("/centre/print-run/reset", { method: "POST" }),
   sheets: () => req("/answer-sheets"),
   evalQueue: () => req("/evaluator/queue"),
   submitEval: (body: any) =>

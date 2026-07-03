@@ -329,12 +329,20 @@ async def reset_vault():
 # ---- Centre / Answer Sheet / Evaluation ----
 @api_router.get("/centre/dashboard")
 async def centre_dashboard():
+    session = await db.vault_sessions.find_one({"active": True}, {"_id": 0}) or {}
+    signed = len(session.get("signatures", []))
+    unlocked = session.get("status") == "UNLOCKED"
+    exam_start = (datetime.now(timezone.utc) + timedelta(minutes=44, seconds=51)).isoformat()
     return {
         "centre": CENTRES[0],
-        "paper_status": "DECRYPTED",
-        "printed_count": 812,
+        "exam": "NEET UG 2028",
+        "exam_start": exam_start,
+        "paper_status": "DECRYPTED" if unlocked else "AWAITING_KEY",
+        "vault_signed": signed,
+        "vault_threshold": session.get("threshold", 3),
+        "printed_count": 812 if unlocked else 0,
         "total_seats": 900,
-        "printer": {"id": "PRN-DEL-014-03", "status": "ACTIVE", "queue": 12},
+        "printer": {"id": "PRN-DEL-014-03", "status": "ACTIVE" if unlocked else "STANDBY", "queue": 12 if unlocked else 0},
         "cctv_stream": "SECURE",
         "watermark_id": short_hash("watermark", 10).upper(),
         "timeline": [
@@ -345,6 +353,161 @@ async def centre_dashboard():
             {"ts": "07:52:18", "event": "812 of 900 papers printed", "hash": short_hash("t5")},
         ],
     }
+
+
+PRINTER_FLEET = [
+    {"id": "PRN-DEL-014-01", "bay": "Bay-A1", "model": "SecurePress-9800", "capacity": 180},
+    {"id": "PRN-DEL-014-02", "bay": "Bay-A2", "model": "SecurePress-9800", "capacity": 180},
+    {"id": "PRN-DEL-014-03", "bay": "Bay-B1", "model": "SecurePress-9800", "capacity": 180},
+    {"id": "PRN-DEL-014-04", "bay": "Bay-B2", "model": "SecurePress-9800", "capacity": 180},
+    {"id": "PRN-DEL-014-05", "bay": "Bay-C1", "model": "SecurePress-9800", "capacity": 90},
+    {"id": "PRN-DEL-014-06", "bay": "Bay-C2", "model": "SecurePress-9800", "capacity": 90},
+]
+
+
+async def _get_print_run():
+    doc = await db.print_runs.find_one({"centre_id": "CTR-DEL-014"}, {"_id": 0})
+    if doc:
+        return doc
+    doc = {
+        "centre_id": "CTR-DEL-014",
+        "state": "IDLE",
+        "started_at": None,
+        "aes_progress": 0,
+        "aes_key_fingerprint": None,
+        "paper_id": "QP-NEET-UG-2028-A1",
+        "printers": [{**p, "printed": 0, "state": "STANDBY"} for p in PRINTER_FLEET],
+    }
+    await db.print_runs.insert_one(doc.copy())
+    doc.pop("_id", None)
+    return doc
+
+
+@api_router.post("/centre/decrypt")
+async def centre_decrypt():
+    session = await db.vault_sessions.find_one({"active": True}, {"_id": 0}) or {}
+    if session.get("status") != "UNLOCKED":
+        raise HTTPException(400, "Vault has not been unlocked by 3-of-5 authorities yet")
+    fingerprint = session.get("aes_fingerprint") or short_hash("aeskey", 32)
+    key_material = sha256(f"{session.get('id','')}:decrypt:{now_iso()}")
+    await db.print_runs.update_one(
+        {"centre_id": "CTR-DEL-014"},
+        {"$set": {
+            "state": "DECRYPTING",
+            "started_at": now_iso(),
+            "aes_progress": 0,
+            "aes_key_fingerprint": fingerprint,
+            "key_material_hash": key_material,
+        }},
+        upsert=True,
+    )
+    await log_audit("centre.decrypt.begin", "CTR-DEL-014", {"session": session.get("id")})
+    return {
+        "state": "DECRYPTING",
+        "aes_key_fingerprint": fingerprint,
+        "key_material_hash": key_material,
+        "authorities_ack": AUTHORITIES,
+        "estimated_seconds": 6,
+    }
+
+
+@api_router.get("/centre/print-run")
+async def get_print_run():
+    doc = await _get_print_run()
+    return doc
+
+
+@api_router.post("/centre/print-run/start")
+async def start_print_run():
+    doc = await _get_print_run()
+    if doc.get("state") not in ("DECRYPTING", "DECRYPTED"):
+        # Auto-decrypt if vault is unlocked but we haven't triggered decryption yet
+        session = await db.vault_sessions.find_one({"active": True}, {"_id": 0}) or {}
+        if session.get("status") != "UNLOCKED":
+            raise HTTPException(400, "Decrypt paper first (vault must be unlocked)")
+    printers = [{**p, "printed": 0, "state": "PRINTING"} for p in PRINTER_FLEET]
+    await db.print_runs.update_one(
+        {"centre_id": "CTR-DEL-014"},
+        {"$set": {"state": "PRINTING", "printers": printers, "print_started_at": now_iso()}},
+    )
+    await log_audit("centre.print.start", "CTR-DEL-014", {})
+    return {"state": "PRINTING", "printers": printers}
+
+
+@api_router.get("/centre/print-run/tick")
+async def tick_print_run():
+    """Advance the print run by a small increment on each poll (drives the live UI)."""
+    doc = await _get_print_run()
+    printers = doc.get("printers") or [{**p, "printed": 0, "state": "STANDBY"} for p in PRINTER_FLEET]
+    if doc.get("state") != "PRINTING":
+        return {"state": doc.get("state", "IDLE"), "printers": printers, "watermarks": []}
+    watermarks: List[Dict[str, Any]] = []
+    all_done = True
+    for p in printers:
+        cap = p.get("capacity", 90)
+        printed = p.get("printed", 0)
+        if printed < cap:
+            inc = random.randint(6, 14)
+            new_printed = min(cap, printed + inc)
+            for i in range(printed, new_printed):
+                watermarks.append({
+                    "printer": p["id"],
+                    "serial": i + 1,
+                    "watermark": short_hash(f"{p['id']}:{i}", 10).upper(),
+                    "qr": f"CTR-DEL-014|{p['id']}|{i+1:03d}",
+                    "ts": now_iso(),
+                })
+            p["printed"] = new_printed
+            if new_printed >= cap:
+                p["state"] = "COMPLETE"
+            else:
+                all_done = False
+        else:
+            p["state"] = "COMPLETE"
+    new_state = "COMPLETE" if all_done else "PRINTING"
+    await db.print_runs.update_one(
+        {"centre_id": "CTR-DEL-014"},
+        {"$set": {"printers": printers, "state": new_state}},
+    )
+    if watermarks:
+        await db.print_watermarks.insert_many([{**w} for w in watermarks[:20]])
+    total_printed = sum(p.get("printed", 0) for p in printers)
+    total_capacity = sum(p.get("capacity", 0) for p in printers)
+    return {
+        "state": new_state,
+        "printers": printers,
+        "watermarks": watermarks[-6:],
+        "total_printed": total_printed,
+        "total_capacity": total_capacity,
+    }
+
+
+@api_router.post("/centre/print-run/reset")
+async def reset_print_run():
+    await db.print_runs.delete_many({"centre_id": "CTR-DEL-014"})
+    await db.print_watermarks.delete_many({})
+    doc = await _get_print_run()
+    return doc
+
+
+@api_router.get("/centre/paper-preview")
+async def paper_preview():
+    """Return a redacted paper preview (safe for public UI)."""
+    session = await db.vault_sessions.find_one({"active": True}, {"_id": 0}) or {}
+    unlocked = session.get("status") == "UNLOCKED"
+    return {
+        "paper_id": "QP-NEET-UG-2028-A1",
+        "decrypted": unlocked,
+        "watermark": short_hash("watermark", 10).upper(),
+        "aes_fingerprint": session.get("aes_fingerprint"),
+        "sample_questions": [
+            {"n": 1, "text": "A particle moves in a plane with position vector r(t) = 3t î + (4t − 2t²) ĵ. Find its velocity at t = 1s."},
+            {"n": 2, "text": "Which of the following molecules exhibits sp³ hybridisation? (A) CO₂ (B) BF₃ (C) CH₄ (D) C₂H₂"},
+            {"n": 3, "text": "In a light-independent reaction of photosynthesis, the enzyme responsible for CO₂ fixation is _____ ."},
+            {"n": 4, "text": "The osmotic pressure of a 0.1 M NaCl solution at 27 °C is closest to:"},
+        ] if unlocked else [],
+    }
+
 
 
 @api_router.get("/answer-sheets")

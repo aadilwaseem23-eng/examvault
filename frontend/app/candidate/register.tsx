@@ -206,7 +206,7 @@ export default function Register() {
                 loading={loading}
                 onPress={() => (step === STEPS.length - 1 ? submit() : setStep(step + 1))}
                 style={{ flex: 1 }}
-                testID="reg-continue-button"
+                testID="register-continue"
               />
             </View>
             <View style={{ alignItems: "center", marginTop: 8 }}>

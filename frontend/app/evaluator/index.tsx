@@ -45,7 +45,7 @@ export default function EvaluatorDashboard() {
             {queue.map((q) => {
               const isActive = active?.sheet_id === q.sheet_id;
               return (
-                <View key={q.sheet_id} style={[s.qRow, isActive && s.qActive]}>
+                <View key={q.sheet_id} style={[s.qRow, isActive && s.qActive]} testID={`queue-item-${q.sheet_id}`}>
                   <View style={s.qLeft}>
                     <Text style={s.qId}>{q.sheet_id}</Text>
                     <Text style={s.qMeta}>
@@ -92,7 +92,7 @@ export default function EvaluatorDashboard() {
               icon="cube-outline"
               onPress={submit}
               disabled={!active || !!submitted}
-              testID="eval-submit-button"
+              testID="submit-evaluation"
             />
           </GlassCard>
 

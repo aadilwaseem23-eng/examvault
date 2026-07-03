@@ -43,7 +43,7 @@ export default function VerifyCert() {
               autoCapitalize="characters"
               placeholderTextColor={colors.onSurfaceTertiary}
               placeholder="EV-CERT-…"
-              testID="verify-cert-input"
+              testID="cert-id-input"
             />
             <View style={{ height: spacing.md }} />
             <Button

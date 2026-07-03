@@ -187,11 +187,13 @@ export default function VaultScreen() {
           title="Multi-Signature Vault"
           subtitle="Threshold cryptography · 3-of-5"
           right={
-            <Badge
-              label={unlocked ? "UNLOCKED" : "SEALED"}
-              tone={unlocked ? "success" : "info"}
-              icon={unlocked ? "lock-open-outline" : "lock-closed-outline"}
-            />
+            <View testID="vault-status">
+              <Badge
+                label={unlocked ? "UNLOCKED" : "SEALED"}
+                tone={unlocked ? "success" : "info"}
+                icon={unlocked ? "lock-open-outline" : "lock-closed-outline"}
+              />
+            </View>
           }
         />
         <ScrollView contentContainerStyle={{ padding: spacing.lg, paddingBottom: spacing.xxxl }}>
