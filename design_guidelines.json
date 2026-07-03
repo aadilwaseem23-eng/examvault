@@ -1,0 +1,212 @@
+{
+  "app_name": "ExamVault",
+  "personality": "7 Dark-First Utility structure with 6 Glass / Luxe surfaces",
+  "personality_one_liner": "A highly secure, Palantir-inspired cryptographic command center using frosted glass over deep slate to command government-grade trust.",
+  "color": {
+    "surface": "#0F172A",
+    "onSurface": "#F8FAFC",
+    "surfaceSecondary": "#1E293B",
+    "onSurfaceSecondary": "#CBD5E1",
+    "surfaceTertiary": "#334155",
+    "onSurfaceTertiary": "#94A3B8",
+    "surfaceInverse": "#F8FAFC",
+    "onSurfaceInverse": "#0F172A",
+    "brand": "#06B6D4",
+    "brandPrimary": "#38BDF8",
+    "onBrandPrimary": "#0F172A",
+    "brandSecondary": "#0EA5E9",
+    "onBrandSecondary": "#F8FAFC",
+    "brandTertiary": "rgba(56, 189, 248, 0.12)",
+    "onBrandTertiary": "#38BDF8",
+    "success": "#10B981",
+    "onSuccess": "#022C22",
+    "warning": "#F59E0B",
+    "onWarning": "#451A03",
+    "error": "#EF4444",
+    "onError": "#450A0A",
+    "info": "#38BDF8",
+    "onInfo": "#082F49",
+    "border": "#334155",
+    "borderStrong": "#475569",
+    "divider": "#1E293B"
+  },
+  "typography": {
+    "displayFontFamily": "Inter",
+    "textFontFamily": "Inter",
+    "scale": {
+      "sm": 12,
+      "base": 14,
+      "lg": 16,
+      "xl": 20,
+      "2xl": 24
+    }
+  },
+  "spacing": {
+    "rule": "Maintain strict, dense command-center utility spacing. Use lg/xl padding for glass cards to let the blur breathe, but keep data metrics packed tightly using sm/md.",
+    "xs": 4,
+    "sm": 8,
+    "md": 12,
+    "lg": 16,
+    "xl": 24,
+    "2xl": 32,
+    "3xl": 48
+  },
+  "radius_tokens": {
+    "sm": 6,
+    "md": 12,
+    "lg": 20,
+    "pill": 999
+  },
+  "shadow_tier": "2",
+  "navigation": "role_selector_landing_then_bottom_tabs",
+  "icon_set": "Phosphor",
+  "glassmorphism": {
+    "enabled": "true",
+    "do's": [
+      "Use frosted glass heavily on hero elements (vault cards, stat widgets) to emulate Palantir/Apple HIG.",
+      "Apply dark tint under glass (≥75% opacity) to ensure text readability over the #0F172A background.",
+      "Use glass on sticky headers, bottom sheets, and the multi-sig authority status cards."
+    ],
+    "dont's": [
+      "Do not blur standard list rows, form inputs, or dense data charts.",
+      "Never render text on un-tinted glass.",
+      "Avoid glass overload on the Evaluation and Analytics dashboards to preserve data legibility."
+    ]
+  },
+  "platform_libraries": {
+    "glass": {
+      "ios": "expo-glass-effect",
+      "android": "expo-blur",
+      "low_end_android_fallback": "solid surfaceSecondary"
+    },
+    "image": "expo-image",
+    "blur": "expo-blur",
+    "bottom_sheet": "@gorhom/bottom-sheet",
+    "animation": "react-native-reanimated",
+    "gesture": "react-native-gesture-handler"
+  },
+  "screens": [
+    {
+      "name": "Role Selection Landing",
+      "purpose": "A cinematic hero landing that displays scale stats (30M+ Students) and allows selection of the 5 personas.",
+      "states": {
+        "loading": "Centered glowing brand spinner.",
+        "empty": "N/A",
+        "error": "Failed to load personas, retry button."
+      },
+      "layout": "Full-bleed background image with vertical top-to-bottom gradient scrim. Large display typography. 5 glassmorphism cards for roles (Candidate, Vault Authority, Exam Centre, Evaluator, Analytics)."
+    },
+    {
+      "name": "Candidate Registration",
+      "purpose": "Secure onboarding flow with document upload and simulated AI face verification.",
+      "states": {
+        "loading": "Skeleton of form inputs.",
+        "empty": "N/A",
+        "error": "Verification failed banner."
+      },
+      "layout": "Single column form. Top half dedicated to a camera viewfinder UI with animated scanning reticles (using Reanimated) overlapping the biometric face scan image."
+    },
+    {
+      "name": "Digital Admit Card",
+      "purpose": "Displays a non-repudiable candidate identity card with QR and cryptographic signatures.",
+      "states": {
+        "loading": "Skeleton card.",
+        "empty": "No admit card found.",
+        "error": "Failed to fetch admit card."
+      },
+      "layout": "Centered, high-elevation glass card mimicking a physical ID. Contains a prominent QR code, face thumbnail, and a 'Blockchain Verified' glowing badge at the bottom."
+    },
+    {
+      "name": "Vault Authority (Hero Screen)",
+      "purpose": "Multi-signature 3-of-5 digital vault dashboard to unlock the question paper.",
+      "states": {
+        "loading": "Vault visualization building up.",
+        "empty": "N/A",
+        "error": "Blockchain sync failed."
+      },
+      "layout": "Top: 3D animated vault visual (Reanimated/Skia pulses) + countdown timer. Middle: Progress bar (X of 5 signatures). Bottom: Grid of 5 authority cards showing 'Signed' (emerald) or 'Waiting' (slate) states. Dramatic unlock animation when threshold met."
+    },
+    {
+      "name": "Exam Centre Dashboard",
+      "purpose": "Command center for the local node to track printing, decryption, and candidate flow.",
+      "states": {
+        "loading": "Skeleton metrics.",
+        "empty": "No active exams today.",
+        "error": "Failed to sync center data."
+      },
+      "layout": "Dark-first utility layout. Sticky header. Top metrics row (2-col grid). Below: Live timeline of paper decryption and printing status with high-contrast mono typography for times/hashes."
+    },
+    {
+      "name": "Answer Sheet Tracking",
+      "purpose": "Logs QR tagging and hashes the physical answer sheet into the blockchain.",
+      "states": {
+        "loading": "Connecting to ledger...",
+        "empty": "Scan a sheet to begin.",
+        "error": "Hash mismatch, please rescan."
+      },
+      "layout": "Camera viewport taking top 40% with scanning guides. Bottom 60% is a bottom sheet showing the real-time audit trail and generated SHA-256 hashes."
+    },
+    {
+      "name": "Evaluation Dashboard",
+      "purpose": "Secure interface for evaluators to enter marks with immutable audit logging.",
+      "states": {
+        "loading": "Loading candidate sheet...",
+        "empty": "No sheets left to evaluate.",
+        "error": "Save failed."
+      },
+      "layout": "Split layout (or tabs if on phone): One tab for viewing the scanned sheet (expo-image with zoom), another for numerical entry. Strict forms with sticky 'Submit to Blockchain' primary CTA."
+    },
+    {
+      "name": "Result & Certificate Verification",
+      "purpose": "Public/Candidate facing view showing transparent results and blockchain badge.",
+      "states": {
+        "loading": "Verifying signature...",
+        "empty": "Result not declared.",
+        "error": "Invalid certificate hash."
+      },
+      "layout": "Premium presentation. Candidate details overlaid on a glass panel. Huge 'VERIFIED' emerald status. Download certificate button (brandPrimary) sticky at the bottom."
+    },
+    {
+      "name": "Government Analytics",
+      "purpose": "Macroscopic view of the entire examination lifecycle for officials.",
+      "states": {
+        "loading": "Aggregating national data...",
+        "empty": "No data for current cycle.",
+        "error": "Analytics engine unreachable."
+      },
+      "layout": "Dashboard heavy. Multiple chart cards (bar, line) using Reanimated/Skia. Dense spacing. Emphasize tracking incident reports and verification latencies."
+    }
+  ],
+  "images": {
+    "hero_network": {
+      "url": "https://images.unsplash.com/photo-1644088379091-d574269d422f?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Nzh8MHwxfHNlYXJjaHwxfHxhYnN0cmFjdCUyMGN5YmVyc2VjdXJpdHklMjBuZXR3b3JrJTIwZGFyayUyMGJsdWV8ZW58MHx8fHwxNzgyNzIwNDI0fDA&ixlib=rb-4.1.0&q=85",
+      "alt": "Abstract blue cybersecurity network lines"
+    },
+    "biometric_face": {
+      "url": "https://images.unsplash.com/photo-1552859118-40c2ab37c92d?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA2MjJ8MHwxfHNlYXJjaHwxfHxiaW9tZXRyaWMlMjBmYWNlJTIwc2NhbiUyMGRhcmslMjBhYnN0cmFjdHxlbnwwfHx8fDE3ODI1MzExNzd8MA&ixlib=rb-4.1.0&q=85",
+      "alt": "Abstract 3D biometric face scan visualization"
+    },
+    "secure_vault": {
+      "url": "https://images.pexels.com/photos/29450016/pexels-photo-29450016.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "alt": "Luminous 3D geometric abstract secure vault representation"
+    }
+  },
+  "haptics": {
+    "role_selection": "impactLight",
+    "signature_added": "impactMedium",
+    "vault_unlocked": "notificationSuccess",
+    "qr_scanned": "notificationSuccess",
+    "hash_generated": "impactLight",
+    "error_state": "notificationError"
+  },
+  "instructions_to_main_agent": [
+    "Design Identity: The app must feel like a premium, 2028-era Palantir/Apple HIG hybrid. It is NOT a web admin dashboard; it is a native mobile cryptographic command center.",
+    "Colors & Surfaces: Strictly adhere to the #0F172A slate base and #38BDF8 electric blue accent. No indigo, purple, or pure blue. Use glassmorphism heavily for elevated cards, over a dark tinted background (>= 75% opacity) to guarantee readability.",
+    "Typography: Use Inter with maximum font weight of 500. Drive hierarchy entirely through font size (sm to 3xl) and color brightness (onSurface vs onSurfaceSecondary). Never use bold/extrabold.",
+    "Hero Screen (Vault Authority): This is the centerpiece. Build a dramatic 3-of-5 threshold UI. Use `secure_vault` image as a background with a heavy top-to-bottom gradient scrim. The 5 authority cards should sit below it as glassmorphic panels.",
+    "Interaction: Ensure all bottom CTAs are sticky with proper safe-area padding. Provide haptic feedback on all critical interactions (QR scan, signature commit, vault unlock).",
+    "Use Phosphor icons consistently, sticking to one variant (e.g., filled vs outlined) across the app. Do not mix weights.",
+    "Make sure forms don't use floating labels. Always use labels above the input.",
+    "Do not use emojis anywhere in the system UI. Rely on icons or the provided abstract imagery."
+  ]
+}
