@@ -403,18 +403,17 @@ export default function MarketingLanding() {
               ].map((row, i) => (
                 <Reveal key={i} delay={i * 90} translate={22}>
                   <View style={styles.cmpRow}>
-                    <View style={[styles.cmpCell, styles.cmpCellLeft]}>
-                      <View style={styles.cmpIconL}>
-                        <Ionicons name={row.li as any} size={16} color={colors.error} />
-                      </View>
-                      <Text style={styles.cmpLeftT}>{row.l}</Text>
+                    <View style={styles.cmpIconL}>
+                      <Ionicons name={row.li as any} size={18} color={colors.error} />
                     </View>
-                    <View style={[styles.cmpCell, styles.cmpCellRight]}>
-                      <View style={styles.cmpIconR}>
-                        <Ionicons name={row.ri as any} size={16} color={colors.success} />
-                      </View>
-                      <Text style={styles.cmpRightT}>{row.r}</Text>
+                    <Text style={styles.cmpLeftT} numberOfLines={2}>{row.l}</Text>
+                    <View style={styles.cmpArrow}>
+                      <Ionicons name="arrow-forward" size={14} color={colors.onSurfaceSecondary} />
                     </View>
+                    <View style={styles.cmpIconR}>
+                      <Ionicons name={row.ri as any} size={18} color={colors.success} />
+                    </View>
+                    <Text style={styles.cmpRightT} numberOfLines={2}>{row.r}</Text>
                   </View>
                 </Reveal>
               ))}
@@ -929,59 +928,59 @@ const styles = StyleSheet.create({
   },
   cmpRow: {
     flexDirection: "row",
-    gap: spacing.md,
-    marginBottom: spacing.sm,
-  },
-  cmpCell: {
-    flex: 1,
-    minWidth: 0,
-    flexDirection: "row",
     alignItems: "center",
     gap: spacing.md,
-    padding: spacing.md,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.lg,
     borderRadius: radius.md,
     borderWidth: 1,
-  },
-  cmpCellLeft: {
     borderColor: colors.border,
     backgroundColor: "rgba(30,41,59,0.5)",
-  },
-  cmpCellRight: {
-    borderColor: "rgba(16,185,129,0.3)",
-    backgroundColor: "rgba(16,185,129,0.05)",
+    marginBottom: spacing.sm,
   },
   cmpIconL: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     borderWidth: 1,
     borderColor: "rgba(239,68,68,0.35)",
-    backgroundColor: "rgba(239,68,68,0.08)",
+    backgroundColor: "rgba(239,68,68,0.10)",
     alignItems: "center",
     justifyContent: "center",
+    flexShrink: 0,
   },
   cmpIconR: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "rgba(16,185,129,0.4)",
+    backgroundColor: "rgba(16,185,129,0.10)",
+    alignItems: "center",
+    justifyContent: "center",
+    flexShrink: 0,
+  },
+  cmpArrow: {
     width: 32,
     height: 32,
     borderRadius: 16,
-    borderWidth: 1,
-    borderColor: "rgba(16,185,129,0.35)",
-    backgroundColor: "rgba(16,185,129,0.08)",
+    backgroundColor: "rgba(148,163,184,0.15)",
     alignItems: "center",
     justifyContent: "center",
+    flexShrink: 0,
   },
   cmpLeftT: {
-    color: colors.onSurfaceSecondary,
+    color: colors.onSurface,
     fontSize: fs.base,
     flex: 1,
-    textDecorationLine: "line-through",
-    textDecorationColor: "rgba(239,68,68,0.5)",
+    minWidth: 0,
   },
   cmpRightT: {
     color: colors.onSurface,
     fontSize: fs.base,
     fontWeight: fw.medium,
     flex: 1,
+    minWidth: 0,
   },
   cmpMobileArrow: {
     alignSelf: "center",
