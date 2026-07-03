@@ -53,6 +53,12 @@ export default function MarketingLanding() {
   const router = useRouter();
   const { width } = useWindowDimensions();
   const isWide = width >= 780;
+  const isTiny = width < 380;
+
+  // Fluid hero sizing — prevents character-by-character wrap on narrow phones
+  const heroSize = width >= 1024 ? 76 : width >= 780 ? 60 : width >= 500 ? 46 : width >= 380 ? 40 : 34;
+  const heroLS = width >= 780 ? 4 : width >= 500 ? 3 : 1.5;
+  const heroSubSize = width >= 1024 ? 22 : width >= 780 ? 20 : width >= 500 ? 17 : 15;
 
   // running counter on the hero stats
   const [count, setCount] = useState(0);
@@ -71,28 +77,31 @@ export default function MarketingLanding() {
   return (
     <View style={{ flex: 1, backgroundColor: colors.surface }}>
       <Head>
-        <title>ExamVault — Blockchain & AI Powered Examination Infrastructure</title>
+        <title>ExamVault | Blockchain & AI Powered Digital Examination Infrastructure</title>
         <meta
           name="description"
-          content="A Blockchain & AI Powered Examination Infrastructure for Secure, Transparent and Trusted Assessments. Multi-signature vaults, cryptographic paper distribution, on-chain certificates."
+          content="ExamVault is a secure digital public infrastructure for high-stakes examinations powered by AI, Blockchain, Cryptography, Zero Trust Architecture and Multi-Signature Security."
         />
+        <meta name="robots" content="index,follow" />
         <meta name="theme-color" content="#0F172A" />
-        <meta property="og:title" content="ExamVault — Restoring Trust in High-Stakes Examinations" />
-        <meta
-          property="og:description"
-          content="Secure by design, not by trust. Every stage of an examination — from question paper to certificate — cryptographically bound."
-        />
+        <link rel="canonical" href="https://examvault-delta.vercel.app" />
+        {/* Open Graph */}
+        <meta property="og:site_name" content="ExamVault" />
+        <meta property="og:title" content="ExamVault" />
+        <meta property="og:description" content="Blockchain & AI Powered Digital Examination Infrastructure" />
         <meta property="og:type" content="website" />
-        <meta property="og:image" content={IMG.network} />
+        <meta property="og:url" content="https://examvault-delta.vercel.app" />
+        <meta property="og:image" content="https://examvault-delta.vercel.app/og-image.png" />
+        <meta property="og:image:secure_url" content="https://examvault-delta.vercel.app/og-image.png" />
+        <meta property="og:image:type" content="image/png" />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content="ExamVault — Blockchain & AI Powered Digital Examination Infrastructure" />
+        {/* Twitter */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="ExamVault — Blockchain & AI Powered Examination Infrastructure" />
-        <meta
-          name="twitter:description"
-          content="Secure by design, not by trust. Multi-signature vaults · AI verification · Blockchain certificates."
-        />
-        <meta name="twitter:image" content={IMG.network} />
+        <meta name="twitter:title" content="ExamVault" />
+        <meta name="twitter:description" content="Blockchain & AI Powered Digital Examination Infrastructure" />
+        <meta name="twitter:image" content="https://examvault-delta.vercel.app/og-image.png" />
       </Head>
       <SafeAreaView edges={["top"]} style={{ flex: 1 }}>
         <ScrollView
@@ -139,9 +148,20 @@ export default function MarketingLanding() {
 
             {/* Hero content */}
             <Container wide={1120}>
-              <View style={[styles.heroInner, { paddingTop: isWide ? 72 : 40 }]}>
-                <Text style={[styles.brand, isWide && { fontSize: 72 }]}>EXAMVAULT</Text>
-                <Text style={[styles.brandSub, isWide && { fontSize: 22 }]}>
+              <View style={[styles.heroInner, { paddingTop: isWide ? 72 : 32 }]}>
+                <Text
+                  numberOfLines={1}
+                  adjustsFontSizeToFit
+                  allowFontScaling={false}
+                  accessibilityRole="header"
+                  aria-level={1}
+                  style={[styles.brand, { fontSize: heroSize, letterSpacing: heroLS }]}
+                >
+                  EXAMVAULT
+                </Text>
+                <Text
+                  style={[styles.brandSub, { fontSize: heroSubSize, maxWidth: isWide ? 620 : "100%" }]}
+                >
                   A Blockchain & AI Powered Examination Infrastructure for Secure, Transparent and Trusted Assessments
                 </Text>
                 <Text style={styles.brandTag}>Secure. Transparent. Traceable. Trusted.</Text>
@@ -170,8 +190,8 @@ export default function MarketingLanding() {
 
           {/* ============================== HERO STATS ============================== */}
           <Container wide={1080}>
-            <View style={{ marginTop: -40 }}>
-              <View style={[styles.statRow, !isWide && { flexWrap: "wrap" }]}>
+            <View style={{ marginTop: isTiny ? -20 : -40 }}>
+              <View style={styles.statRow}>
                 <StatBig value={`${(count / 1_000_000).toFixed(1)}M+`} label="Registered candidates" />
                 <StatBig value="10,248" label="Exam centres" />
                 <StatBig value="99.99%" label="Data integrity" />
@@ -472,11 +492,26 @@ export default function MarketingLanding() {
           {/* ============================== FOOTER ============================== */}
           <View style={{ marginTop: spacing.xxxl, paddingVertical: spacing.xl }}>
             <Container>
+              {/* Prototype disclaimer */}
+              <View style={styles.disclaimer}>
+                <View style={styles.disclaimerHead}>
+                  <Ionicons name="information-circle-outline" size={16} color={colors.brandPrimary} />
+                  <Text style={styles.disclaimerTitle}>Prototype Status</Text>
+                </View>
+                <Text style={styles.disclaimerBody}>
+                  ExamVault is a conceptual product prototype created to demonstrate how AI, Blockchain,
+                  Cryptography and Zero Trust principles can strengthen the security and transparency of
+                  high-stakes examinations. This prototype focuses on user experience, workflow validation
+                  and system architecture rather than production deployment.
+                </Text>
+              </View>
+
               <View
                 style={{
                   borderTopWidth: StyleSheet.hairlineWidth,
                   borderTopColor: colors.border,
                   paddingTop: spacing.lg,
+                  marginTop: spacing.lg,
                   flexDirection: isWide ? "row" : "column",
                   justifyContent: "space-between",
                   alignItems: isWide ? "center" : "flex-start",
@@ -627,14 +662,14 @@ const styles = StyleSheet.create({
   },
   brandBadgeText: { color: colors.brandPrimary, fontSize: fs.sm, letterSpacing: 1.4, fontWeight: fw.medium },
   heroInner: { paddingBottom: spacing.xxl },
-  brand: { color: colors.onSurface, fontSize: 48, fontWeight: fw.medium, letterSpacing: 4 },
-  brandSub: { color: colors.onSurfaceSecondary, fontSize: fs.lg, marginTop: spacing.sm, letterSpacing: 0.3, maxWidth: 620 },
+  brand: { color: colors.onSurface, fontSize: 48, fontWeight: fw.medium, letterSpacing: 4, includeFontPadding: false as any },
+  brandSub: { color: colors.onSurfaceSecondary, fontSize: fs.lg, marginTop: spacing.sm, letterSpacing: 0.3, lineHeight: 26 },
   brandTag: { color: colors.brandPrimary, fontSize: fs.base, marginTop: spacing.md, letterSpacing: 1.2 },
 
-  statRow: { flexDirection: "row", gap: spacing.md },
+  statRow: { flexDirection: "row", gap: spacing.md, flexWrap: "wrap" },
   statBig: {
     flex: 1,
-    minWidth: 150,
+    minWidth: 140,
     padding: spacing.lg,
     borderRadius: radius.lg,
     borderWidth: 1,
@@ -790,6 +825,29 @@ const styles = StyleSheet.create({
   contactV: { color: colors.onSurface, fontSize: fs.base, fontWeight: fw.medium, marginTop: 2 },
 
   foot: { color: colors.onSurfaceTertiary, fontSize: fs.sm, letterSpacing: 0.4 },
+
+  // Prototype disclaimer
+  disclaimer: {
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: "rgba(30,41,59,0.55)",
+    padding: spacing.lg,
+    gap: 8,
+  },
+  disclaimerHead: { flexDirection: "row", alignItems: "center", gap: 8 },
+  disclaimerTitle: {
+    color: colors.brandPrimary,
+    fontSize: fs.sm,
+    letterSpacing: 2,
+    fontWeight: fw.medium,
+    textTransform: "uppercase",
+  },
+  disclaimerBody: {
+    color: colors.onSurfaceSecondary,
+    fontSize: fs.base,
+    lineHeight: 22,
+  },
 
   // Vision
   visionCard: {

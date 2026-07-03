@@ -1,0 +1,23 @@
+{
+  "summary": "Frontend-only QA pass on ExamVault marketing landing (https://trust-papers.preview.emergentagent.com/). All 15 test cases from review request PASSED. Hero title 'EXAMVAULT' renders on a single horizontal line across 320/360/375/390/412/430 viewports (measured DOM bounding rect: heights 39–45px, widths always ≤ viewport). No horizontal scrolling at 320px. Hero stat cards render as 2x2 grid on 375px (rows y=649 and y=741). CTAs stack vertically on mobile. Applicable-across strip, Vision section, comparison table and 'Prototype Status' disclaimer all present. All required meta tags present in dist/index.html (title, description, canonical=https://examvault-delta.vercel.app, robots=index,follow, og:image=https://examvault-delta.vercel.app/og-image.png with 1200x630, twitter:card=summary_large_image). Static /app/frontend/dist/og-image.png exists (136,718 bytes > 10KB). Nav CTA and hero CTA both navigate to /prototype. All 5 persona chips navigate to /candidate/register, /vault, /centre, /evaluator, /analytics respectively. Contact email/phone testIDs present with onPress -> Linking.openURL(mailto:aadilwaseem234@gmail.com) and (tel:+918920869628) verified in source (LINKS at index.tsx:26-27). Smoke: /prototype shows 5 role cards, /vault renders multi-sig session, /centre renders command banner without error, /verify/DEMO-CERT-1 renders verifier without error.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [],
+    "react_native_issues": []
+  },
+  "test_report_links": ["/app/test_reports/iteration_2.json"],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "index.tsx is 997 lines — consider splitting hero/stats/vision/comparison/contact sections into separate components for maintainability (not blocking).",
+    "Contact email/phone Pressable does not render as <a href> in RN Web, so it is not crawlable/SEO-visible as a link — value strings are visible text and onPress calls Linking.openURL correctly. Acceptable for RN Web but note that right-click 'copy link' won't work."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A (frontend-only)", "frontend": "100%"},
+  "seed_data_creation": "None",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Landing page hero fluid sizing (heroSize 34→76 based on width, letterSpacing 1.5→4) with numberOfLines=1 + adjustsFontSizeToFit fully resolves vertical wrap bug. Stats 2x2 flex-wrap works on mobile. Meta tags and og-image.png in dist verified. All prototype routes reachable.",
+  "rca_of_issue": "Reported bug (hero vertical wrap on phones) already fixed. Verified via DOM bounding-rect measurement across 6 mobile viewports (320/360/375/390/412/430): height stays 39–45px and width ≤ viewport, confirming single-line render. Fix in /app/frontend/app/index.tsx:59 uses width-based heroSize step function combined with numberOfLines=1 and adjustsFontSizeToFit."
+}
