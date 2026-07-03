@@ -407,9 +407,6 @@ export default function MarketingLanding() {
                       <Ionicons name={row.li as any} size={18} color={colors.error} />
                     </View>
                     <Text style={styles.cmpLeftT} numberOfLines={2}>{row.l}</Text>
-                    <View style={styles.cmpArrow}>
-                      <Ionicons name="arrow-forward" size={14} color={colors.onSurfaceSecondary} />
-                    </View>
                     <View style={styles.cmpIconR}>
                       <Ionicons name={row.ri as any} size={18} color={colors.success} />
                     </View>
