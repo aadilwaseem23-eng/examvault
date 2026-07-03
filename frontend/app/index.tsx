@@ -116,7 +116,7 @@ export default function MarketingLanding() {
               <View style={[styles.heroInner, { paddingTop: isWide ? 72 : 40 }]}>
                 <Text style={[styles.brand, isWide && { fontSize: 72 }]}>EXAMVAULT</Text>
                 <Text style={[styles.brandSub, isWide && { fontSize: 22 }]}>
-                  A Zero-Trust Digital Examination Infrastructure
+                  A Blockchain & AI Powered Examination Infrastructure for Secure, Transparent and Trusted Assessments
                 </Text>
                 <Text style={styles.brandTag}>Secure. Transparent. Traceable. Trusted.</Text>
 
@@ -153,6 +153,27 @@ export default function MarketingLanding() {
               </View>
             </View>
           </Container>
+
+          {/* ============================== VISION ============================== */}
+          <View style={{ marginTop: spacing.xxxl }}>
+            <Container wide={880}>
+              <View style={styles.visionCard}>
+                <LinearGradient
+                  colors={["rgba(56,189,248,0.16)", "rgba(16,185,129,0.06)", "rgba(15,23,42,0.9)"]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={StyleSheet.absoluteFill}
+                />
+                <View style={{ padding: isWide ? spacing.xxl : spacing.xl }}>
+                  <SectionEyebrow>OUR VISION</SectionEyebrow>
+                  <Text style={[styles.visionQ, isWide && { fontSize: 32, lineHeight: 44 }]}>
+                    Imagine a future where every examination is secure by design
+                    <Text style={{ color: colors.brandPrimary }}>{"\u00A0\u2014\u00A0"}not by trust, but by technology.</Text>
+                  </Text>
+                </View>
+              </View>
+            </Container>
+          </View>
 
           {/* ============================== ABOUT ============================== */}
           <View nativeID="about" style={{ marginTop: spacing.xxxl }}>
@@ -194,9 +215,9 @@ export default function MarketingLanding() {
                 <View style={{ flexDirection: "row", alignItems: "flex-start", gap: spacing.md }}>
                   <Ionicons name="alert-circle-outline" size={22} color={colors.warning} />
                   <Text style={styles.body}>
-                    The NEET paper leak controversy (India) highlighted a systemic truth: additional
-                    physical security cannot fix a fundamentally physical process. The remedy must be
-                    architectural — replace transport with cryptography.
+                    Inspired by recent high-stakes examination security challenges around the world:
+                    additional physical security cannot fix a fundamentally physical process. The remedy
+                    must be architectural — replace transport with cryptography.
                   </Text>
                 </View>
               </GlassCard>
@@ -239,6 +260,59 @@ export default function MarketingLanding() {
             </Container>
           </View>
 
+          {/* ============================== CURRENT vs EXAMVAULT ============================== */}
+          <View style={{ marginTop: spacing.xxxl }}>
+            <Container>
+              <SectionEyebrow>COMPARISON · 04</SectionEyebrow>
+              <SectionH2>Current process vs ExamVault</SectionH2>
+              <Text style={styles.lead}>
+                Understand the shift in a single glance — every point of physical weakness replaced by
+                a cryptographic guarantee.
+              </Text>
+              <View style={{ height: spacing.xl }} />
+
+              {/* Column headers */}
+              <View style={styles.cmpHeadRow}>
+                <View style={[styles.cmpHead, styles.cmpHeadLeft]}>
+                  <Ionicons name="close-circle-outline" size={16} color={colors.error} />
+                  <Text style={styles.cmpHeadT}>Current Process</Text>
+                </View>
+                <View style={[styles.cmpHead, styles.cmpHeadRight]}>
+                  <Ionicons name="shield-checkmark-outline" size={16} color={colors.success} />
+                  <Text style={[styles.cmpHeadT, { color: colors.success }]}>ExamVault</Text>
+                </View>
+              </View>
+
+              {[
+                { l: "Physical paper transportation", r: "Encrypted digital distribution", li: "cube-outline", ri: "cloud-upload-outline" },
+                { l: "Manual identity verification", r: "AI-assisted identity verification", li: "eye-off-outline", ri: "sparkles-outline" },
+                { l: "Multiple leak points", r: "Multi-Signature Digital Vault", li: "warning-outline", ri: "lock-closed-outline" },
+                { l: "Difficult investigations", r: "Immutable blockchain audit trail", li: "search-outline", ri: "cube-outline" },
+                { l: "Manual certificate verification", r: "Instant blockchain verification", li: "document-outline", ri: "flash-outline" },
+              ].map((row, i) => (
+                <View key={i} style={[styles.cmpRow, !isWide && { flexDirection: "column" }]}>
+                  <View style={[styles.cmpCell, styles.cmpCellLeft]}>
+                    <View style={styles.cmpIconL}>
+                      <Ionicons name={row.li as any} size={16} color={colors.error} />
+                    </View>
+                    <Text style={styles.cmpLeftT}>{row.l}</Text>
+                  </View>
+                  {!isWide && (
+                    <View style={styles.cmpMobileArrow}>
+                      <Ionicons name="arrow-down" size={16} color={colors.brandPrimary} />
+                    </View>
+                  )}
+                  <View style={[styles.cmpCell, styles.cmpCellRight]}>
+                    <View style={styles.cmpIconR}>
+                      <Ionicons name={row.ri as any} size={16} color={colors.success} />
+                    </View>
+                    <Text style={styles.cmpRightT}>{row.r}</Text>
+                  </View>
+                </View>
+              ))}
+            </Container>
+          </View>
+
           {/* ============================== TRY PROTOTYPE ============================== */}
           <View style={{ marginTop: spacing.xxxl }}>
             <Container>
@@ -250,7 +324,7 @@ export default function MarketingLanding() {
                   style={StyleSheet.absoluteFill}
                 />
                 <View style={{ padding: isWide ? spacing.xxl : spacing.xl }}>
-                  <SectionEyebrow>DEMO · 04</SectionEyebrow>
+                  <SectionEyebrow>DEMO · 05</SectionEyebrow>
                   <SectionH2>Try the live prototype</SectionH2>
                   <Text style={styles.lead}>
                     Explore the full lifecycle across 5 personas — Candidate, Vault Authority, Exam Centre,
@@ -281,7 +355,7 @@ export default function MarketingLanding() {
           {/* ============================== RESOURCES ============================== */}
           <View style={{ marginTop: spacing.xxxl }}>
             <Container>
-              <SectionEyebrow>RESOURCES · 05</SectionEyebrow>
+              <SectionEyebrow>RESOURCES · 06</SectionEyebrow>
               <SectionH2>Read the story in depth</SectionH2>
               <View style={{ height: spacing.lg }} />
               <View style={[styles.gridCards, !isWide && { flexDirection: "column" }]}>
@@ -316,7 +390,7 @@ export default function MarketingLanding() {
           {/* ============================== CONTACT ============================== */}
           <View style={{ marginTop: spacing.xxxl }}>
             <Container>
-              <SectionEyebrow>CONTACT · 06</SectionEyebrow>
+              <SectionEyebrow>CONTACT · 07</SectionEyebrow>
               <SectionH2>Get in touch</SectionH2>
               <Text style={styles.lead}>
                 For partnerships, pilots or press — reach out. We reply within one working day.
@@ -662,4 +736,116 @@ const styles = StyleSheet.create({
   contactV: { color: colors.onSurface, fontSize: fs.base, fontWeight: fw.medium, marginTop: 2 },
 
   foot: { color: colors.onSurfaceTertiary, fontSize: fs.sm, letterSpacing: 0.4 },
+
+  // Vision
+  visionCard: {
+    borderRadius: radius.lg,
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: "rgba(56,189,248,0.35)",
+  },
+  visionQ: {
+    color: colors.onSurface,
+    fontSize: fs["2xl"],
+    lineHeight: 34,
+    fontWeight: fw.medium,
+    letterSpacing: 0.2,
+    marginTop: spacing.md,
+    maxWidth: 780,
+  },
+
+  // Comparison
+  cmpHeadRow: { flexDirection: "row", gap: spacing.md, marginBottom: spacing.sm },
+  cmpHead: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    paddingVertical: 10,
+    paddingHorizontal: spacing.md,
+    borderRadius: radius.md,
+    borderWidth: 1,
+  },
+  cmpHeadLeft: {
+    borderColor: "rgba(239,68,68,0.35)",
+    backgroundColor: "rgba(239,68,68,0.08)",
+  },
+  cmpHeadRight: {
+    borderColor: "rgba(16,185,129,0.4)",
+    backgroundColor: "rgba(16,185,129,0.08)",
+  },
+  cmpHeadT: {
+    color: colors.error,
+    fontSize: fs.sm,
+    fontWeight: fw.medium,
+    letterSpacing: 1.6,
+    textTransform: "uppercase",
+  },
+  cmpRow: {
+    flexDirection: "row",
+    gap: spacing.md,
+    marginBottom: spacing.sm,
+  },
+  cmpCell: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.md,
+    padding: spacing.md,
+    borderRadius: radius.md,
+    borderWidth: 1,
+  },
+  cmpCellLeft: {
+    borderColor: colors.border,
+    backgroundColor: "rgba(30,41,59,0.5)",
+  },
+  cmpCellRight: {
+    borderColor: "rgba(16,185,129,0.3)",
+    backgroundColor: "rgba(16,185,129,0.05)",
+  },
+  cmpIconL: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: "rgba(239,68,68,0.35)",
+    backgroundColor: "rgba(239,68,68,0.08)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  cmpIconR: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: "rgba(16,185,129,0.35)",
+    backgroundColor: "rgba(16,185,129,0.08)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  cmpLeftT: {
+    color: colors.onSurfaceSecondary,
+    fontSize: fs.base,
+    flex: 1,
+    textDecorationLine: "line-through",
+    textDecorationColor: "rgba(239,68,68,0.5)",
+  },
+  cmpRightT: {
+    color: colors.onSurface,
+    fontSize: fs.base,
+    fontWeight: fw.medium,
+    flex: 1,
+  },
+  cmpMobileArrow: {
+    alignSelf: "center",
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: "rgba(56,189,248,0.35)",
+    backgroundColor: colors.brandGlow,
+    alignItems: "center",
+    justifyContent: "center",
+    marginVertical: 4,
+  },
 });
