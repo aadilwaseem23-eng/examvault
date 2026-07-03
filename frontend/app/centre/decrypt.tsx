@@ -9,9 +9,9 @@ import Animated, {
   useAnimatedStyle,
   withTiming,
   withRepeat,
-  withDelay,
   Easing,
   interpolate,
+  SharedValue,
 } from "react-native-reanimated";
 import { colors, spacing, radius, fs, fw } from "@/src/theme";
 import { Screen, Header, Button, GlassCard, KV, Badge, SectionTitle } from "@/src/components/ui";
@@ -22,6 +22,44 @@ function randomHex(n: number) {
   let s = "";
   for (let i = 0; i < n; i++) s += HEX[Math.floor(Math.random() * 16)];
   return s;
+}
+
+function AuthorityOrb({ i, p, R }: { i: number; p: SharedValue<number>; R: number }) {
+  const angle = (i / 5) * Math.PI * 2 - Math.PI / 2;
+  const x = Math.cos(angle) * R;
+  const y = Math.sin(angle) * R;
+  const style = useAnimatedStyle(() => {
+    const t = interpolate(p.value, [0, 0.35 + i * 0.08, 1], [0, 0, 1]);
+    return {
+      transform: [
+        { translateX: x * (1 - t) },
+        { translateY: y * (1 - t) },
+        { scale: 1 - t * 0.5 },
+      ],
+      opacity: 1 - t * 0.35,
+    };
+  });
+  return (
+    <Animated.View style={[cs.orb, style]}>
+      <Text style={cs.orbText}>A{i + 1}</Text>
+    </Animated.View>
+  );
+}
+
+function AuthorityBeam({ i, p }: { i: number; p: SharedValue<number> }) {
+  const angle = (i / 5) * Math.PI * 2 - Math.PI / 2;
+  const style = useAnimatedStyle(() => ({
+    opacity: interpolate(p.value, [0.15 + i * 0.05, 0.6 + i * 0.05], [0, 0.6], "clamp"),
+  }));
+  return (
+    <Animated.View
+      style={[
+        cs.beam,
+        { transform: [{ rotate: `${(angle * 180) / Math.PI + 90}deg` }] },
+        style,
+      ]}
+    />
+  );
 }
 
 function KeyCeremony({ active }: { active: boolean }) {
@@ -52,48 +90,12 @@ function KeyCeremony({ active }: { active: boolean }) {
       <View style={cs.centralKey}>
         <Ionicons name="key" size={28} color={colors.brandPrimary} />
       </View>
-      {[0, 1, 2, 3, 4].map((i) => {
-        const angle = (i / 5) * Math.PI * 2 - Math.PI / 2;
-        const x = Math.cos(angle) * R;
-        const y = Math.sin(angle) * R;
-        // eslint-disable-next-line react-hooks/rules-of-hooks
-        const style = useAnimatedStyle(() => {
-          const t = interpolate(p.value, [0, 0.35 + i * 0.08, 1], [0, 0, 1]);
-          return {
-            transform: [
-              { translateX: x * (1 - t) },
-              { translateY: y * (1 - t) },
-              { scale: 1 - t * 0.5 },
-            ],
-            opacity: 1 - t * 0.35,
-          };
-        });
-        return (
-          <Animated.View key={i} style={[cs.orb, style]}>
-            <Text style={cs.orbText}>A{i + 1}</Text>
-          </Animated.View>
-        );
-      })}
-      {/* Beams */}
-      {[0, 1, 2, 3, 4].map((i) => {
-        const angle = (i / 5) * Math.PI * 2 - Math.PI / 2;
-        // eslint-disable-next-line react-hooks/rules-of-hooks
-        const bStyle = useAnimatedStyle(() => ({
-          opacity: interpolate(p.value, [0.15 + i * 0.05, 0.6 + i * 0.05], [0, 0.6], "clamp"),
-        }));
-        return (
-          <Animated.View
-            key={`b-${i}`}
-            style={[
-              cs.beam,
-              {
-                transform: [{ rotate: `${(angle * 180) / Math.PI + 90}deg` }],
-              },
-              bStyle,
-            ]}
-          />
-        );
-      })}
+      {[0, 1, 2, 3, 4].map((i) => (
+        <AuthorityOrb key={`o-${i}`} i={i} p={p} R={R} />
+      ))}
+      {[0, 1, 2, 3, 4].map((i) => (
+        <AuthorityBeam key={`b-${i}`} i={i} p={p} />
+      ))}
     </View>
   );
 }
@@ -268,7 +270,7 @@ export default function DecryptCeremony() {
           <SectionTitle title="Ceremony Log" hint="Every step hashed and anchored" />
           <View style={ds.logBox}>
             {logs.length === 0 ? (
-              <Text style={ds.logHint}>Idle. Press "Begin" to start the ceremony.</Text>
+              <Text style={ds.logHint}>Idle. Press &ldquo;Begin&rdquo; to start the ceremony.</Text>
             ) : (
               logs.map((l, i) => (
                 <View key={i} style={ds.logRow}>

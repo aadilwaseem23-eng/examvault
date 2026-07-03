@@ -1,0 +1,46 @@
+{
+  "summary": "Tested static export (dist) via local http.server + Live URL at 360x800 & 390x844 (Android UA), also with JS disabled. P0 hero hydration invariant is FIXED — 'EXAMVAULT' renders on a single line in ALL conditions (height 42-44px, width <= viewport, white-space: nowrap, fontSize honors clamp). No horizontal scroll. All static-file assertions (data-examvault-hero, clamp CSS, meta tags, canonical, og:image, twitter:card, security headers, og-image.png >10KB, favicon.ico, vercel.json cache-control) PASS. Reveal component OK (no elements stuck invisible). Stats render 2x2. CTAs and disclaimer present. HOWEVER two P0 REGRESSIONS remain: (1) Subtitle line-height is 1.5px (RN unitless -> RNW px bug) causing subtitle to collapse to 4.5px and glyphs OVERLAP the hero title visually. (2) Static export pages /prototype.html and /centre/decrypt.html trigger React error #418 (hydration mismatch) at runtime and render 'Unmatched Route' fallback — SSR HTML is correct, client hydration crashes.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "index.tsx hero subtitle",
+        "issue": "Subtitle Text with data-examvault-hero-sub has lineHeight: 1.5 (unitless) in React Native style object. React Native Web renders it as line-height: 1.5px (absolute), producing a 4.5px-tall element with 15px glyphs that visually overlap the EXAMVAULT hero title above. Confirmed on BOTH local dist AND live URL and on desktop viewport. Fix: replace with an absolute value such as lineHeight: 24 or the CSS-string form 'clamp(22px, 3.4vw, 32px)' (like fontSize on same element). Reference: /app/frontend/app/index.tsx:78",
+        "testID": "data-examvault-hero-sub",
+        "priority": "P0/HIGH"
+      },
+      {
+        "component": "Static export routes /prototype and /centre/decrypt",
+        "issue": "Both /prototype.html and /centre/decrypt.html return status 200 with correct SSR HTML (verified via JS-disabled load: EXAMVAULT, Decryption Ceremony content visible). After JS loads, minified React error #418 (Text content did not match server-rendered HTML — hydration mismatch) is thrown and Expo Router falls back to 'Unmatched Route — Page could not be found'. This is the SAME class of hydration bug that was fixed for the hero. /vault, /centre, /verify/[id].html hydrate correctly. Suspected causes: date/time/random values, useWindowDimensions or Date.now/Math.random in server-computed initial state on these two screens (KeyCeremony refactor + prototype page).",
+        "testID": "",
+        "priority": "P0/CRITICAL"
+      }
+    ],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "landing (/)", "issues": ["Subtitle overlaps hero title due to lineHeight:1.5 -> 1.5px bug (see ui_bugs #1)."]}
+    ],
+    "react_native_issues": [
+      {"component": "Text lineHeight (index.tsx:78)", "issue": "Using unitless lineHeight: 1.5 in a StyleSheet with a web-CSS-string fontSize ('clamp(...)'). React Native Web treats numeric lineHeight as pixels, not multiplier. Use absolute pixels or a CSS-string clamp() for lineHeight too."}
+    ]
+  },
+  "test_report_links": [],
+  "action_items": [
+    "P0: Fix /app/frontend/app/index.tsx line 78 — change lineHeight: 1.5 to an absolute value (e.g., lineHeight: 24) or CSS string like `lineHeight: 'clamp(22px, 3.4vw, 32px)'` inside the web-branch style. Rebuild `npx expo export -p web` and re-verify subtitle height ≈ fontSize*1.4 not 1.5px.",
+    "P0: Investigate hydration crash (React #418) on /prototype and /centre/decrypt. Common causes to check: Date.now(), Math.random(), new Date().toLocaleString(), useWindowDimensions() used inline in JSX (like the original hero bug), or client-only imports rendering different markup. Run `npx expo export -p web` with a non-minified React or add ErrorBoundary + console log to identify the mismatch.",
+    "After fixes, re-verify: (a) subtitle bounding-rect height ≥ 20px per line, (b) /prototype and /centre/decrypt do NOT show 'Unmatched Route' after hydration, (c) no minified React error #418 in console.",
+    "Optional: add rewrites in vercel.json for /prototype -> /prototype.html and /centre/decrypt -> /centre/decrypt.html (currently only /verify/:id has a rewrite). Otherwise cleanUrls handles it on Vercel, but this is worth double-checking on deployment."
+  ],
+  "critical_code_review_comments": [
+    "index.tsx line 78: lineHeight: 1.5 inside a RN StyleSheet gets serialized as CSS 'line-height: 1.5px' on web (RN Web behavior). Root cause of subtitle collapse.",
+    "index.tsx has grown large (~900+ lines). Consider extracting Hero, Stats, Vision, Reveal sections into separate components under src/components/landing/.",
+    "vercel.json cleanUrls:true is good; adding explicit rewrites for /prototype and /centre/decrypt is not required but would make local static-server testing match Vercel exactly."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A (frontend only)", "frontend": "82% (9/11 P0 items pass; subtitle overlap and hydration crash on 2 routes fail)"},
+  "seed_data_creation": "None",
+  "retest_needed": true,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Local static server: cd /app/frontend/dist && python3 -m http.server 4321. Test with viewport 360x800, UA 'Mozilla/5.0 (Linux; Android 12; SM-A536B) ...'. Live URL: https://trust-papers.preview.emergentagent.com. Reproduce subtitle bug: navigate to /, measure `document.querySelector('[data-examvault-hero-sub=true]')` — bug when getComputedStyle.lineHeight === '1.5px'. Reproduce /prototype crash: navigate to /prototype.html, check console for 'Minified React error #418' and body text 'Unmatched Route'. With JS disabled the SSR HTML is correct on both.",
+  "rca_of_issue": "Subtitle overlap RCA: React Native Web serializes numeric style values with an implicit 'px' unit. For most props this is desired, but for `lineHeight` in web CSS a unitless value (e.g., 1.5) is a *multiplier* of fontSize, while `1.5px` is a fixed pixel line-box. The dev intended a multiplier but wrote `lineHeight: 1.5` in a JS style object, which was emitted as `line-height: 1.5px`. Because the fontSize is now a CSS clamp() string, the fallback pixel lineHeight can't scale either. Fix by using an absolute px value or a clamp() string for lineHeight to match the fontSize. Route hydration RCA (hypothesis): the same category of pre-hydration divergence that was fixed for the hero (SSR baked a viewport-dependent value that mismatched client re-render) likely still exists in /prototype and /centre/decrypt — probably in the KeyCeremony refactor or a viewport/animation initial value; React error #418 = Text content mismatch."
+}

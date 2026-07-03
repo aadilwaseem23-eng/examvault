@@ -6,6 +6,7 @@ import {
   View,
   Pressable,
   Linking,
+  Platform,
   useWindowDimensions,
 } from "react-native";
 import { Image } from "expo-image";
@@ -32,11 +33,12 @@ const openExt = (url: string) => Linking.openURL(url).catch(() => {});
 // --------- reusable section wrapper (centers content on wide web) ----------
 const MAX_W = 960;
 const Container: React.FC<{ children: React.ReactNode; wide?: number }> = ({ children, wide }) => {
-  const { width } = useWindowDimensions();
   const maxW = wide ?? MAX_W;
+  // Use CSS width caps rather than JS-measured min(width, maxW) to avoid
+  // hydration flashes when useWindowDimensions returns build-time defaults.
   return (
     <View style={{ width: "100%", alignItems: "center", paddingHorizontal: spacing.lg }}>
-      <View style={{ width: "100%", maxWidth: Math.min(maxW, width) }}>{children}</View>
+      <View style={{ width: "100%", maxWidth: maxW }}>{children}</View>
     </View>
   );
 };
@@ -55,10 +57,26 @@ export default function MarketingLanding() {
   const isWide = width >= 780;
   const isTiny = width < 380;
 
-  // Fluid hero sizing — prevents character-by-character wrap on narrow phones
-  const heroSize = width >= 1024 ? 76 : width >= 780 ? 60 : width >= 500 ? 46 : width >= 380 ? 40 : 34;
-  const heroLS = width >= 780 ? 4 : width >= 500 ? 3 : 1.5;
-  const heroSubSize = width >= 1024 ? 22 : width >= 780 ? 20 : width >= 500 ? 17 : 15;
+  // --------- Hydration-safe hero sizing ---------
+  // Rationale: JS-computed viewport-dependent fontSize causes an SSR/CSR
+  // hydration mismatch on Android after refresh (the static HTML paints
+  // *before* hydration runs and re-measures). Fix: use CSS `clamp()` on
+  // web (viewport-aware at paint time, zero JS dependency) with
+  // `whiteSpace: nowrap` so the wordmark can NEVER wrap character-by-character.
+  // Native gets a static fallback since native has no SSR.
+  const heroTitleStyle = Platform.OS === "web"
+    ? ({
+        fontSize: "clamp(2rem, 10vw, 5rem)",
+        letterSpacing: "clamp(1.5px, 0.6vw, 4px)",
+        whiteSpace: "nowrap",
+        wordBreak: "keep-all",
+        overflowWrap: "normal",
+        display: "block",
+      } as any)
+    : { fontSize: 44, letterSpacing: 3 };
+  const heroSubStyle = Platform.OS === "web"
+    ? ({ fontSize: "clamp(15px, 2.2vw, 22px)", lineHeight: 1.5, wordBreak: "normal", overflowWrap: "break-word" } as any)
+    : { fontSize: 18, lineHeight: 26 };
 
   // running counter on the hero stats
   const [count, setCount] = useState(0);
@@ -84,7 +102,10 @@ export default function MarketingLanding() {
         />
         <meta name="robots" content="index,follow" />
         <meta name="theme-color" content="#0F172A" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <link rel="canonical" href="https://examvault-delta.vercel.app" />
+        <link rel="icon" type="image/png" href="/favicon.ico" />
+        <link rel="apple-touch-icon" href="/favicon.ico" />
         {/* Open Graph */}
         <meta property="og:site_name" content="ExamVault" />
         <meta property="og:title" content="ExamVault" />
@@ -102,6 +123,23 @@ export default function MarketingLanding() {
         <meta name="twitter:title" content="ExamVault" />
         <meta name="twitter:description" content="Blockchain & AI Powered Digital Examination Infrastructure" />
         <meta name="twitter:image" content="https://examvault-delta.vercel.app/og-image.png" />
+        {/* Hydration-safe global CSS: prevents Android portrait character-wrap on the hero,
+            eliminates horizontal scroll, and enforces baseline dark background before JS mounts. */}
+        <style>{`
+          html, body, #root { background-color: #0F172A; margin: 0; padding: 0; }
+          html, body { overflow-x: hidden; }
+          [data-examvault-hero] {
+            white-space: nowrap !important;
+            word-break: keep-all !important;
+            overflow-wrap: normal !important;
+            display: block !important;
+            max-width: 100vw;
+          }
+          [data-examvault-hero-sub] { word-break: normal !important; overflow-wrap: break-word !important; }
+          @media (prefers-reduced-motion: reduce) {
+            * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+          }
+        `}</style>
       </Head>
       <SafeAreaView edges={["top"]} style={{ flex: 1 }}>
         <ScrollView
@@ -151,16 +189,17 @@ export default function MarketingLanding() {
               <View style={[styles.heroInner, { paddingTop: isWide ? 72 : 32 }]}>
                 <Text
                   numberOfLines={1}
-                  adjustsFontSizeToFit
                   allowFontScaling={false}
                   accessibilityRole="header"
                   aria-level={1}
-                  style={[styles.brand, { fontSize: heroSize, letterSpacing: heroLS }]}
+                  dataSet={{ examvaultHero: "true" }}
+                  style={[styles.brand, heroTitleStyle]}
                 >
                   EXAMVAULT
                 </Text>
                 <Text
-                  style={[styles.brandSub, { fontSize: heroSubSize, maxWidth: isWide ? 620 : "100%" }]}
+                  dataSet={{ examvaultHeroSub: "true" }}
+                  style={[styles.brandSub, heroSubStyle, { maxWidth: isWide ? 620 : "100%" }]}
                 >
                   A Blockchain & AI Powered Examination Infrastructure for Secure, Transparent and Trusted Assessments
                 </Text>
