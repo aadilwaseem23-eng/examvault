@@ -1,0 +1,46 @@
+{
+  "summary": "TIGHT P0 hydration verification on 3 routes at viewport 390x844. All 3 assertions PASSED. No React #418 errors, no hydration keyword errors observed across any of the 3 loads. EXAMVAULT hero renders correctly (h=44px, w=358px), subtitle does not overlap. /prototype loads at correct URL with testID 'role-candidate' present. /centre/decrypt loads with testID 'ceremony-begin' present.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [],
+    "react_native_issues": []
+  },
+  "verification_details": {
+    "route_root": {
+      "url": "https://trust-papers.preview.emergentagent.com/",
+      "examvault_bounding_box": {"x": 16, "y": 83, "width": 358, "height": 44},
+      "height_between_30_100": true,
+      "width_le_viewport": true,
+      "subtitle_top": 135,
+      "hero_bottom": 127,
+      "no_overlap": true,
+      "console_418_errors": 0,
+      "hydration_keyword_errors": 0
+    },
+    "route_prototype": {
+      "url_stays": true,
+      "final_url": "https://trust-papers.preview.emergentagent.com/prototype",
+      "unmatched_fallback": false,
+      "role_candidate_testid_present": true,
+      "console_418_errors": 0
+    },
+    "route_centre_decrypt": {
+      "final_url": "https://trust-papers.preview.emergentagent.com/centre/decrypt",
+      "ceremony_begin_testid_present": true,
+      "ceremony_begin_box": {"x": 16, "y": 780, "width": 358, "height": 48},
+      "console_418_errors": 0
+    }
+  },
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A", "frontend": "100%"},
+  "seed_data_creation": "None",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "P0 hydration fix verified green on / , /prototype, /centre/decrypt at 390x844. Only benign console noise seen: 'shadow*' style deprecation warnings and React DevTools info. No #418, no hydration errors.",
+  "rca_of_issue": "N/A - verification only"
+}
